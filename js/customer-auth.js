@@ -3,6 +3,7 @@
 (() => {
     const api = window.DuAmigoAPI;
     const backend = window.DuAmigoBackend;
+    const utils = window.DuAmigoUtils;
     const page = document.body.dataset.customerAuthPage;
 
     if (!api || !backend || !page) return;
@@ -58,10 +59,7 @@
 
     const formatPhone = (input) => {
         input?.addEventListener("input", () => {
-            const digits = input.value.replace(/\D/g, "").slice(0, 11);
-            if (digits.length <= 2) input.value = digits;
-            else if (digits.length <= 7) input.value = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-            else input.value = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+            input.value = utils.formatBrazilPhone(input.value);
         });
     };
 
@@ -159,14 +157,14 @@
             event.preventDefault();
             const values = Object.fromEntries(new FormData(form));
             const fullName = String(values.fullName || "").trim();
-            const phone = String(values.phone || "").replace(/\D/g, "");
+            const phone = utils.normalizeBrazilPhone(values.phone);
             const email = String(values.email || "").trim();
             const password = String(values.password || "");
             const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
             const valid = {
                 fullName: fullName.length >= 3,
-                phone: phone.length >= 10,
+                phone: utils.isValidBrazilPhone(phone),
                 email: emailValid,
                 password: password.length >= 6
             };

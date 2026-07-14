@@ -166,14 +166,14 @@
     };
 
     const contactProduct = (product) => {
-        const digits = state.settings?.phone_digits || config.business.phoneDigits;
+        const digits = utils.toWhatsAppDigits(state.settings?.phone_digits || state.settings?.phone_display || config.business.phoneDigits);
         if (!digits) {
             showToast("Cadastre o WhatsApp da barbearia no painel para ativar esta consulta.");
             return;
         }
 
         const message = encodeURIComponent(`Olá! Tenho interesse no produto "${product.name}" da Barbearia du Amigo.`);
-        window.open(`https://wa.me/55${digits}?text=${message}`, "_blank", "noopener,noreferrer");
+        window.open(`https://wa.me/${digits}?text=${message}`, "_blank", "noopener,noreferrer");
     };
 
     const load = async () => {

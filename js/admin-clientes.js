@@ -5,6 +5,7 @@
     const admin = window.DuAmigoAdmin;
     await admin.initPromise;
     const esc = admin.escapeHTML;
+    const utils = window.DuAmigoUtils;
 
     const tbody = document.querySelector("[data-customers-body]");
     const search = document.querySelector("[data-customer-search]");
@@ -29,7 +30,7 @@
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><strong>${esc(customer.nickname || customer.name)}</strong><span>${esc(customer.name)} · ${esc(customer.email || "Sem e-mail")}</span></td>
-                <td>${esc(customer.phone)}</td>
+                <td>${esc(utils.formatBrazilPhone(customer.phone, "Sem telefone"))}</td>
                 <td>${completed.length}</td>
                 <td>${latest ? admin.formatDateTime(latest.starts_at) : "Nunca"}</td>
                 <td><button class="table-action" type="button" data-edit-customer="${customer.id}">Editar</button></td>
@@ -43,7 +44,7 @@
                 form.elements.id.value = customer.id;
                 form.elements.name.value = customer.name || "";
                 form.elements.nickname.value = customer.nickname || "";
-                form.elements.phone.value = customer.phone || "";
+                form.elements.phone.value = utils.formatBrazilPhone(customer.phone);
                 form.elements.birth_date.value = customer.birth_date || "";
                 form.elements.email.value = customer.email || "";
                 form.elements.style_preferences.value = customer.style_preferences || "";

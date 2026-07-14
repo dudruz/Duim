@@ -5,6 +5,12 @@
     const admin = window.DuAmigoAdmin;
     await admin.initPromise;
     const esc = admin.escapeHTML;
+    const utils = window.DuAmigoUtils;
+    const billingInfo = (appointment) => {
+        if (appointment.billing_mode === "subscription") return { label: "Mensalista", className: "is-subscription" };
+        if (appointment.billing_mode === "online") return { label: appointment.payment_status === "paid" ? "Pré-pago" : "Aguardando pagamento", className: "is-online" };
+        return { label: appointment.payment_status === "paid" ? "Recebido no salão" : "A cobrar", className: "is-salon" };
+    };
 
     const list = document.querySelector("[data-agenda-list]");
     const dateInput = document.querySelector("[data-agenda-date]");
@@ -32,7 +38,10 @@
                 ? ` · ${customer.name}`
                 : "";
             const phone = customer.phone || "";
+            const phoneDisplay = utils.formatBrazilPhone(phone, "Sem telefone");
+            const whatsappDigits = utils.toWhatsAppDigits(phone);
             const preference = customer.style_preferences || "";
+            const billing = billingInfo(appointment);
             const card = document.createElement("article");
             card.className = "agenda-card";
             card.innerHTML = `
@@ -44,9 +53,12 @@
                     <div class="agenda-card__heading">
                         <div>
                             <strong>${esc(displayName)}${esc(legalName)}</strong>
-                            <span>${esc(appointment.services?.name || "Serviço")} · ${esc(phone || "Sem telefone")}</span>
+                            <span>${esc(appointment.services?.name || "Serviço")} · ${esc(phoneDisplay)}</span>
                         </div>
-                        <span class="status-badge status-badge--${appointment.status}">${admin.statusLabel(appointment.status)}</span>
+                        <div class="agenda-card__badges">
+                            <span class="billing-badge ${billing.className}">${billing.label}</span>
+                            <span class="status-badge status-badge--${appointment.status}">${admin.statusLabel(appointment.status)}</span>
+                        </div>
                     </div>
                     ${preference ? `<p class="agenda-card__preference"><strong>Preferência:</strong> ${esc(preference)}</p>` : ""}
                     ${appointment.notes ? `<p><strong>Observação:</strong> ${esc(appointment.notes)}</p>` : ""}
@@ -56,19 +68,21 @@
                                 `<option value="${status}" ${status === appointment.status ? "selected" : ""}>${admin.statusLabel(status)}</option>`
                             ).join("")}
                         </select>
-                        <select aria-label="Situação do pagamento" data-payment-id="${appointment.id}">
+                        <select aria-label="Situação do pagamento" data-payment-id="${appointment.id}" ${appointment.billing_mode === "subscription" || (appointment.billing_mode === "online" && appointment.payment_status === "paid") ? "disabled" : ""}>
                             ${["unpaid", "paid", "refunded"].map((status) =>
                                 `<option value="${status}" ${status === appointment.payment_status ? "selected" : ""}>${admin.statusLabel(status)}</option>`
                             ).join("")}
                         </select>
-                        <select aria-label="Forma de pagamento" data-method-id="${appointment.id}">
+                        <select aria-label="Forma de pagamento" data-method-id="${appointment.id}" ${appointment.billing_mode === "subscription" || appointment.billing_mode === "online" ? "disabled" : ""}>
                             <option value="" ${!appointment.payment_method ? "selected" : ""}>Forma</option>
                             <option value="pix" ${appointment.payment_method === "pix" ? "selected" : ""}>Pix</option>
                             <option value="cash" ${appointment.payment_method === "cash" ? "selected" : ""}>Dinheiro</option>
                             <option value="card" ${appointment.payment_method === "card" ? "selected" : ""}>Cartão</option>
                             <option value="transfer" ${appointment.payment_method === "transfer" ? "selected" : ""}>Transferência</option>
+                            <option value="infinitepay" ${appointment.payment_method === "infinitepay" ? "selected" : ""}>InfinitePay</option>
+                            <option value="subscription" ${appointment.payment_method === "subscription" ? "selected" : ""}>Mensalidade</option>
                         </select>
-                        ${phone ? `<a class="admin-link" href="https://wa.me/55${esc(phone)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+                        ${whatsappDigits ? `<a class="admin-link" href="https://wa.me/${esc(whatsappDigits)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
                     </div>
                 </div>
             `;

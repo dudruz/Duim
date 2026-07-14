@@ -25,7 +25,9 @@
         confirmed: "Confirmado",
         completed: "Concluído",
         cancelled: "Cancelado",
-        no_show: "Não compareceu"
+        no_show: "Não compareceu",
+        active: "Ativo",
+        paused: "Pausado"
     };
 
     const setStatus = (message = "", type = "info") => {
@@ -34,12 +36,7 @@
         status.dataset.type = type;
     };
 
-    const formatPhoneDisplay = (value = "") => {
-        const digits = String(value).replace(/\D/g, "").slice(-11);
-        if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-        if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-        return value;
-    };
+    const formatPhoneDisplay = (value = "") => utils.formatBrazilPhone(value);
 
     const bindPhoneMask = (input) => {
         input?.addEventListener("input", () => {
@@ -71,6 +68,12 @@
             && new Date(appointment.starts_at).getTime() > Date.now();
     };
 
+    const isActiveSubscription = (item) => {
+        if (!item || item.status !== "active") return false;
+        if (!item.ends_on) return true;
+        return new Date(`${item.ends_on}T23:59:59`).getTime() >= Date.now();
+    };
+
     const getUpcoming = () => (overview?.appointments || [])
         .filter(isUpcoming)
         .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
@@ -79,7 +82,7 @@
         const appointments = overview.appointments || [];
         const completed = appointments.filter((item) => item.status === "completed").length;
         const next = getUpcoming()[0];
-        const activePlan = (overview.subscriptions || []).find((item) => item.status === "active");
+        const activePlan = (overview.subscriptions || []).find(isActiveSubscription);
 
         document.querySelector("[data-account-completed]").textContent = String(completed);
         document.querySelector("[data-account-next-short]").textContent = next ? dateParts(next.starts_at).short : "—";
@@ -193,7 +196,8 @@
             const title = document.createElement("h3");
             title.textContent = appointment.services?.name || "Atendimento";
             const detail = document.createElement("p");
-            detail.textContent = `${parts.long} às ${parts.time} · ${utils.formatCurrency(appointment.total_amount)}`;
+            const billingLabel = appointment.billing_mode === "subscription" ? "Mensalista" : (appointment.payment_status === "paid" ? "Pré-pago" : "A cobrar");
+            detail.textContent = `${parts.long} às ${parts.time} · ${utils.formatCurrency(appointment.total_amount)} · ${billingLabel}`;
             content.append(title, detail);
 
             const actions = document.createElement("div");
@@ -213,38 +217,162 @@
         });
     };
 
+    const requestStatusLabels = {
+        pending_payment: "Aguardando pagamento",
+        pending_approval: "Aguardando aprovação do Duin",
+        approved: "Aprovado",
+        rejected: "Recusado",
+        cancelled: "Cancelado",
+        expired: "Expirado"
+    };
+
     const renderPlan = () => {
         planContainer.replaceChildren();
-        const plan = (overview.subscriptions || []).find((item) => item.status === "active");
+        const activePlan = (overview.subscriptions || []).find(isActiveSubscription);
+        const requests = overview.subscriptionRequests || [];
+        const plans = overview.plans || [];
 
-        if (!plan) {
+        if (activePlan) {
+            const card = document.createElement("article");
+            card.className = "account-plan";
+            const badge = createStatusBadge(activePlan.status);
+            const title = document.createElement("h3");
+            title.textContent = activePlan.plans?.name || "Plano";
+            const description = document.createElement("p");
+            description.textContent = activePlan.plans?.description || "Plano ativo na Barbearia du Amigo.";
+            const uses = document.createElement("div");
+            uses.className = "account-plan__uses";
+            const label = document.createElement("span");
+            label.textContent = "Usos restantes";
+            const value = document.createElement("strong");
+            value.textContent = String(activePlan.remaining_uses);
+            uses.append(label, value);
+            card.append(badge, title, description, uses);
+            planContainer.append(card);
+        } else {
             const empty = document.createElement("div");
             empty.className = "account-empty";
             const strong = document.createElement("strong");
-            strong.textContent = "Você não possui plano ativo.";
+            strong.textContent = "Você ainda não possui plano ativo.";
             const text = document.createElement("p");
-            text.textContent = "Os planos cadastrados pelo Duin aparecerão aqui.";
+            text.textContent = "Escolha uma mensalidade abaixo e pague online ou no salão.";
             empty.append(strong, text);
             planContainer.append(empty);
-            return;
         }
 
-        const card = document.createElement("article");
-        card.className = "account-plan";
-        const badge = createStatusBadge(plan.status);
-        const title = document.createElement("h3");
-        title.textContent = plan.plans?.name || "Plano";
-        const description = document.createElement("p");
-        description.textContent = plan.plans?.description || "Plano ativo na Barbearia du Amigo.";
-        const uses = document.createElement("div");
-        uses.className = "account-plan__uses";
-        const label = document.createElement("span");
-        label.textContent = "Usos restantes";
-        const value = document.createElement("strong");
-        value.textContent = String(plan.remaining_uses);
-        uses.append(label, value);
-        card.append(badge, title, description, uses);
-        planContainer.append(card);
+        if (requests.length) {
+            const heading = document.createElement("div");
+            heading.className = "account-panel__subheading";
+            const title = document.createElement("h3");
+            title.textContent = "Solicitações";
+            heading.append(title);
+            const list = document.createElement("div");
+            list.className = "subscription-request-list";
+
+            requests.slice(0, 5).forEach((request) => {
+                const card = document.createElement("article");
+                card.className = "subscription-request-card";
+                card.dataset.status = request.status;
+                const top = document.createElement("div");
+                top.className = "subscription-request-card__top";
+                const info = document.createElement("div");
+                const name = document.createElement("strong");
+                name.textContent = request.plans?.name || "Mensalidade";
+                const method = document.createElement("p");
+                method.textContent = request.payment_choice === "online" ? "Pagamento pelo site" : "Pagamento em dinheiro no salão";
+                info.append(name, method);
+                const value = document.createElement("strong");
+                value.className = "plan-offer__price";
+                value.textContent = utils.formatCurrency(request.amount);
+                top.append(info, value);
+                const status = document.createElement("span");
+                status.className = "status-badge";
+                status.dataset.status = request.status;
+                status.textContent = requestStatusLabels[request.status] || request.status;
+                card.append(top, status);
+                if (request.status === "pending_payment") {
+                    if (request.checkout_url) {
+                        const link = document.createElement("a");
+                        link.className = "button button--small button--primary";
+                        link.href = request.checkout_url;
+                        link.textContent = "Continuar pagamento";
+                        card.append(link);
+                    } else {
+                        const retryCheckout = document.createElement("button");
+                        retryCheckout.type = "button";
+                        retryCheckout.className = "button button--small button--primary";
+                        retryCheckout.dataset.resumeSubscriptionCheckout = request.id;
+                        retryCheckout.textContent = "Gerar pagamento";
+                        card.append(retryCheckout);
+                    }
+                }
+                list.append(card);
+            });
+            planContainer.append(heading, list);
+        }
+
+        if (overview.settings?.subscription_sales_enabled !== false && plans.length) {
+            const heading = document.createElement("div");
+            heading.className = "account-panel__subheading";
+            const title = document.createElement("h3");
+            title.textContent = "Planos disponíveis";
+            const text = document.createElement("p");
+            text.textContent = "O pagamento online ativa automaticamente. Em dinheiro, o Duin recebe uma solicitação para aprovar.";
+            heading.append(title, text);
+            const marketplace = document.createElement("div");
+            marketplace.className = "plan-marketplace";
+
+            plans.forEach((plan) => {
+                const hasOpenRequest = requests.some((request) => request.plan_id === plan.id && ["pending_payment", "pending_approval"].includes(request.status));
+                const offer = document.createElement("article");
+                offer.className = "plan-offer";
+                const top = document.createElement("div");
+                top.className = "plan-offer__top";
+                const copy = document.createElement("div");
+                const name = document.createElement("h3");
+                name.textContent = plan.name;
+                const description = document.createElement("p");
+                description.textContent = plan.description || "Mensalidade da Barbearia du Amigo.";
+                copy.append(name, description);
+                const price = document.createElement("strong");
+                price.className = "plan-offer__price";
+                price.textContent = utils.formatCurrency(plan.price);
+                top.append(copy, price);
+                const meta = document.createElement("div");
+                meta.className = "plan-offer__meta";
+                const cuts = document.createElement("span");
+                cuts.textContent = `${plan.cuts_included} uso(s) incluído(s)`;
+                const cycle = document.createElement("span");
+                cycle.textContent = plan.billing_cycle === "monthly" ? "Renovação mensal" : plan.billing_cycle;
+                meta.append(cuts, cycle);
+                const actions = document.createElement("div");
+                actions.className = "plan-offer__actions";
+                if (hasOpenRequest) {
+                    const pending = document.createElement("span");
+                    pending.className = "status-badge";
+                    pending.textContent = "Solicitação em andamento";
+                    actions.append(pending);
+                } else {
+                    if (overview.settings?.online_payments_enabled) {
+                        const online = document.createElement("button");
+                        online.type = "button";
+                        online.className = "button button--small button--primary";
+                        online.dataset.planOnline = plan.id;
+                        online.textContent = "Pagar no site";
+                        actions.append(online);
+                    }
+                    const cash = document.createElement("button");
+                    cash.type = "button";
+                    cash.className = "button button--small button--secondary";
+                    cash.dataset.planCash = plan.id;
+                    cash.textContent = "Pagar em dinheiro";
+                    actions.append(cash);
+                }
+                offer.append(top, meta, actions);
+                marketplace.append(offer);
+            });
+            planContainer.append(heading, marketplace);
+        }
     };
 
     const fillProfile = () => {
@@ -274,8 +402,8 @@
         const customer = overview?.customer || {};
         const profile = overview?.profile || {};
         const name = String(customer.name || profile.full_name || "").trim();
-        const phone = String(customer.phone || profile.phone || "").replace(/\D/g, "");
-        return Boolean(overview?.customer) && name.length >= 3 && phone.length >= 10;
+        const phone = utils.normalizeBrazilPhone(customer.phone || profile.phone || "");
+        return Boolean(overview?.customer) && name.length >= 3 && utils.isValidBrazilPhone(phone);
     };
 
     const handleBookingRequest = () => {
@@ -349,9 +477,56 @@
             });
         });
 
-        document.addEventListener("click", (event) => {
+        document.addEventListener("click", async (event) => {
             const cancel = event.target.closest("[data-cancel-appointment]");
-            if (cancel) handleCancel(cancel.dataset.cancelAppointment, cancel);
+            if (cancel) {
+                handleCancel(cancel.dataset.cancelAppointment, cancel);
+                return;
+            }
+
+            const resumeCheckout = event.target.closest("[data-resume-subscription-checkout]");
+            if (resumeCheckout) {
+                const original = resumeCheckout.textContent;
+                resumeCheckout.disabled = true;
+                resumeCheckout.textContent = "Abrindo...";
+                try {
+                    const checkout = await api.public.createCheckout({
+                        kind: "subscription",
+                        subscriptionRequestId: resumeCheckout.dataset.resumeSubscriptionCheckout
+                    });
+                    if (!checkout?.url) throw new Error("Não foi possível abrir o checkout.");
+                    window.location.assign(checkout.url);
+                } catch (error) {
+                    setStatus(error?.message || "Não foi possível gerar o pagamento.", "error");
+                    resumeCheckout.disabled = false;
+                    resumeCheckout.textContent = original;
+                }
+                return;
+            }
+
+            const online = event.target.closest("[data-plan-online]");
+            const cash = event.target.closest("[data-plan-cash]");
+            const button = online || cash;
+            if (!button) return;
+            const original = button.textContent;
+            button.disabled = true;
+            button.textContent = online ? "Abrindo pagamento..." : "Enviando...";
+            try {
+                const request = await api.customer.requestSubscription(button.dataset.planOnline || button.dataset.planCash, online ? "online" : "cash");
+                if (online) {
+                    const checkout = await api.public.createCheckout({ kind: "subscription", subscriptionRequestId: request.request_id });
+                    if (!checkout?.url) throw new Error("Não foi possível abrir o checkout.");
+                    window.location.assign(checkout.url);
+                    return;
+                }
+                await load();
+                setStatus("Solicitação enviada ao Duin. O plano será ativado após ele confirmar o pagamento em dinheiro.", "success");
+            } catch (error) {
+                setStatus(error?.message || "Não foi possível solicitar o plano.", "error");
+            } finally {
+                button.disabled = false;
+                button.textContent = original;
+            }
         });
 
         document.querySelector("[data-scroll-profile]")?.addEventListener("click", () => {
@@ -366,10 +541,10 @@
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const values = Object.fromEntries(new FormData(form));
-            const phone = String(values.phone || "").replace(/\D/g, "");
+            const phone = utils.normalizeBrazilPhone(values.phone);
             const fullName = String(values.fullName || "").trim();
             const nameError = fullName.length >= 3 ? "" : "Informe seu nome completo.";
-            const phoneError = phone.length >= 10 ? "" : "Informe um WhatsApp válido com DDD.";
+            const phoneError = utils.isValidBrazilPhone(phone) ? "" : "Informe um WhatsApp válido com DDD.";
             form.querySelector('[data-error-for="fullName"]').textContent = nameError;
             form.querySelector('[data-error-for="phone"]').textContent = phoneError;
             if (nameError || phoneError) return;

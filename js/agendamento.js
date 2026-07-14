@@ -3,7 +3,6 @@
 (() => {
     const api = window.DuAmigoAPI;
     const utils = window.DuAmigoUtils;
-    const config = window.DuAmigoConfig;
     const page = document.querySelector("[data-booking-page]");
     if (!api || !utils || !page) return;
 
@@ -14,32 +13,36 @@
         service: null,
         date: null,
         slot: null,
-        account: null
+        account: null,
+        billingMode: "salon"
     };
 
-    const servicesContainer = document.querySelector("[data-booking-services]");
-    const datesContainer = document.querySelector("[data-booking-dates]");
-    const timesContainer = document.querySelector("[data-booking-times]");
-    const panels = [...document.querySelectorAll("[data-booking-step]")];
-    const progressItems = [...document.querySelectorAll("[data-progress-item]")];
-    const form = document.querySelector("[data-booking-form]");
-    const successPanel = document.querySelector("[data-booking-success]");
-    const pageStatus = document.querySelector("[data-booking-page-status]");
-    const customerStrip = document.querySelector("[data-booking-customer]");
-    const authGate = document.querySelector("[data-booking-auth-gate]");
-    const authenticatedArea = document.querySelector("[data-booking-authenticated]");
-    const gateMessage = document.querySelector("[data-booking-gate-message]");
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const servicesContainer = $("[data-booking-services]");
+    const datesContainer = $("[data-booking-dates]");
+    const timesContainer = $("[data-booking-times]");
+    const panels = $$("[data-booking-step]");
+    const progressItems = $$("[data-progress-item]");
+    const form = $("[data-booking-form]");
+    const successPanel = $("[data-booking-success]");
+    const pageStatus = $("[data-booking-page-status]");
+    const customerStrip = $("[data-booking-customer]");
+    const authGate = $("[data-booking-auth-gate]");
+    const authenticatedArea = $("[data-booking-authenticated]");
+    const gateMessage = $("[data-booking-gate-message]");
+    const paymentOptions = $("[data-booking-payment-options]");
+    const submitButton = form?.querySelector('button[type="submit"]');
 
     const setStatus = (message = "", type = "info") => {
+        if (!pageStatus) return;
         pageStatus.hidden = !message;
         pageStatus.textContent = message;
         pageStatus.dataset.type = type;
     };
 
     const setText = (selector, value) => {
-        document.querySelectorAll(selector).forEach((element) => {
-            element.textContent = value;
-        });
+        $$(selector).forEach((element) => { element.textContent = value; });
     };
 
     const showAuthGate = (message = "") => {
@@ -57,30 +60,39 @@
         if (authenticatedArea) authenticatedArea.hidden = false;
     };
 
-    const formatPhone = (value = "") => {
-        const digits = String(value).replace(/\D/g, "").slice(-11);
-        if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-        if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-        return value || "Não informado";
+    const formatDate = (date, options) => new Intl.DateTimeFormat("pt-BR", options).format(date);
+    const formatPhone = (value = "") => utils.formatBrazilPhone(value, "Não informado");
+    const activeSubscription = () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return (state.account?.subscriptions || []).find((item) => (
+            item.status === "active"
+            && Number(item.remaining_uses || 0) > 0
+            && (!item.ends_on || new Date(`${item.ends_on}T23:59:59`).getTime() >= today.getTime())
+        ));
     };
 
-    const formatDate = (date, options) => new Intl.DateTimeFormat("pt-BR", options).format(date);
-
     const showAccount = () => {
-        const customer = state.account.customer || {};
-        const profile = state.account.profile || {};
-        const user = state.account.user || {};
+        const customer = state.account?.customer || {};
+        const profile = state.account?.profile || {};
+        const user = state.account?.user || {};
         const name = customer.nickname || customer.name || profile.full_name || "Cliente";
         const fullName = customer.name || profile.full_name || name;
         const initial = name.trim().charAt(0).toUpperCase() || "C";
 
-        customerStrip.hidden = false;
+        if (customerStrip) customerStrip.hidden = false;
         setText("[data-booking-customer-name]", name);
         setText("[data-booking-avatar], [data-confirm-avatar]", initial);
         setText("[data-confirm-name]", fullName);
         setText("[data-confirm-phone]", formatPhone(customer.phone || profile.phone));
         setText("[data-confirm-email]", customer.email || profile.email || user.email || "Não informado");
     };
+
+    const paymentLabel = () => ({
+        online: "Pré-pago pelo site",
+        salon: "Pagar no salão",
+        subscription: "Usar mensalidade"
+    }[state.billingMode] || "Pagar no salão");
 
     const updateSummary = () => {
         setText("[data-summary-service]", state.service?.name || "Não escolhido");
@@ -92,6 +104,81 @@
             : "Não escolhido");
         setText("[data-summary-duration]", state.service ? utils.formatDuration(state.service.duration_minutes) : "—");
         setText("[data-summary-price]", state.service ? utils.formatCurrency(state.service.price) : "—");
+        setText("[data-summary-payment]", paymentLabel());
+
+        const noticeTitle = $("[data-payment-notice-title]");
+        const noticeText = $("[data-payment-notice-text]");
+        if (noticeTitle && noticeText) {
+            if (state.billingMode === "online") {
+                noticeTitle.textContent = "Pré-pago com InfinitePay";
+                noticeText.textContent = "Ao confirmar, você será direcionado ao checkout seguro para pagar por Pix ou cartão.";
+            } else if (state.billingMode === "subscription") {
+                const plan = activeSubscription();
+                noticeTitle.textContent = "Atendimento mensalista";
+                noticeText.textContent = plan
+                    ? `${plan.plans?.name || "Plano ativo"}: ${plan.remaining_uses} uso(s) disponível(is).`
+                    : "É necessário possuir um plano ativo com uso disponível.";
+            } else {
+                noticeTitle.textContent = "A cobrar no salão";
+                noticeText.textContent = "O horário fica confirmado e o pagamento é registrado pelo Duin no atendimento.";
+            }
+        }
+    };
+
+    const renderPaymentOptions = () => {
+        if (!paymentOptions) return;
+        paymentOptions.replaceChildren();
+        const plan = activeSubscription();
+        const options = [];
+
+        if (state.settings?.online_payments_enabled) {
+            options.push({
+                value: "online",
+                title: "Pagar agora pelo site",
+                badge: "Pré-pago",
+                description: "Pix ou cartão pelo checkout da InfinitePay. O horário confirma após o pagamento."
+            });
+        }
+        if (plan) {
+            options.push({
+                value: "subscription",
+                title: "Usar minha mensalidade",
+                badge: "Mensalista",
+                description: `${plan.plans?.name || "Plano ativo"} · ${plan.remaining_uses} uso(s) disponível(is).`
+            });
+        }
+        options.push({
+            value: "salon",
+            title: "Pagar no salão",
+            badge: "A cobrar",
+            description: "Pague em dinheiro, Pix ou cartão diretamente com o Duin."
+        });
+
+        if (!options.some((option) => option.value === state.billingMode)) {
+            state.billingMode = plan ? "subscription" : (state.settings?.online_payments_enabled ? "online" : "salon");
+        }
+
+        options.forEach((option) => {
+            const label = document.createElement("label");
+            label.className = "booking-payment-option";
+            label.dataset.paymentMode = option.value;
+            label.innerHTML = `
+                <input type="radio" name="billingMode" value="${option.value}" ${state.billingMode === option.value ? "checked" : ""}>
+                <span class="booking-payment-option__check" aria-hidden="true"></span>
+                <span class="booking-payment-option__content">
+                    <span class="booking-payment-option__top"><strong>${option.title}</strong><em>${option.badge}</em></span>
+                    <span>${option.description}</span>
+                </span>
+            `;
+            paymentOptions.append(label);
+        });
+        updateSummary();
+        updateSubmitLabel();
+    };
+
+    const updateSubmitLabel = () => {
+        if (!submitButton) return;
+        submitButton.textContent = state.billingMode === "online" ? "Ir para pagamento" : "Confirmar agendamento";
     };
 
     const updateProgress = () => {
@@ -103,14 +190,12 @@
     };
 
     const currentPanel = () => panels.find((panel) => Number(panel.dataset.bookingStep) === state.step);
-
     const canContinue = () => {
         if (state.step === 1) return Boolean(state.service);
         if (state.step === 2) return Boolean(state.date);
         if (state.step === 3) return Boolean(state.slot);
         return true;
     };
-
     const updateNextButton = () => {
         const button = currentPanel()?.querySelector("[data-next-step]");
         if (button) button.disabled = !canContinue();
@@ -119,73 +204,40 @@
     const setStep = (nextStep) => {
         if (nextStep > state.step && !canContinue()) return;
         state.step = Math.min(4, Math.max(1, nextStep));
-        panels.forEach((panel) => {
-            panel.hidden = Number(panel.dataset.bookingStep) !== state.step;
-        });
-        successPanel.hidden = true;
+        panels.forEach((panel) => { panel.hidden = Number(panel.dataset.bookingStep) !== state.step; });
+        if (successPanel) successPanel.hidden = true;
+        if (state.step === 4) renderPaymentOptions();
         updateProgress();
         updateNextButton();
         currentPanel()?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
-    const serviceIcon = (service) => {
-        if (service.icon_path) return service.icon_path;
-        return service.name.toLowerCase().includes("barba")
-            ? "../assets/icons/beard.svg"
-            : "../assets/icons/scissors.svg";
-    };
+    const serviceIcon = (service) => service.icon_path || (
+        service.name.toLowerCase().includes("barba") ? "../assets/icons/beard.svg" : "../assets/icons/scissors.svg"
+    );
 
     const renderServices = () => {
         servicesContainer.replaceChildren();
         if (!state.services.length) {
-            const empty = document.createElement("p");
-            empty.className = "empty-message";
-            empty.textContent = "Nenhum serviço ativo foi cadastrado no painel.";
-            servicesContainer.append(empty);
+            servicesContainer.innerHTML = '<p class="empty-message">Nenhum serviço ativo foi cadastrado no painel.</p>';
             return;
         }
-
         state.services.forEach((service) => {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "booking-option";
-            button.dataset.serviceId = service.id;
             button.setAttribute("aria-pressed", "false");
-
-            const top = document.createElement("div");
-            top.className = "booking-option__top";
-            const iconWrap = document.createElement("span");
-            iconWrap.className = "booking-option__icon";
-            const icon = document.createElement("img");
-            icon.src = serviceIcon(service);
-            icon.alt = "";
-            iconWrap.append(icon);
-            const check = document.createElement("span");
-            check.className = "booking-option__check";
-            check.textContent = "✓";
-            top.append(iconWrap, check);
-
-            const content = document.createElement("div");
-            content.className = "booking-option__content";
-            const title = document.createElement("h3");
-            title.textContent = service.name;
-            const description = document.createElement("p");
-            description.textContent = service.description || "Atendimento na Barbearia du Amigo.";
-            content.append(title, description);
-
-            const meta = document.createElement("div");
-            meta.className = "booking-option__meta";
-            const duration = document.createElement("span");
-            duration.textContent = utils.formatDuration(service.duration_minutes);
-            const price = document.createElement("strong");
-            price.textContent = utils.formatCurrency(service.price);
-            meta.append(duration, price);
-
-            button.append(top, content, meta);
+            button.innerHTML = `
+                <span class="booking-option__top"><span class="booking-option__icon"><img src="${serviceIcon(service)}" alt=""></span><span class="booking-option__check">✓</span></span>
+                <span class="booking-option__content"><h3></h3><p></p></span>
+                <span class="booking-option__meta"><span>${utils.formatDuration(service.duration_minutes)}</span><strong>${utils.formatCurrency(service.price)}</strong></span>
+            `;
+            button.querySelector("h3").textContent = service.name;
+            button.querySelector("p").textContent = service.description || "Atendimento na Barbearia du Amigo.";
             button.addEventListener("click", () => {
                 state.service = service;
                 state.slot = null;
-                servicesContainer.querySelectorAll(".booking-option").forEach((option) => {
+                $$(".booking-option", servicesContainer).forEach((option) => {
                     const selected = option === button;
                     option.classList.toggle("is-selected", selected);
                     option.setAttribute("aria-pressed", String(selected));
@@ -218,22 +270,15 @@
             button.type = "button";
             button.className = "date-option";
             button.setAttribute("aria-pressed", "false");
-
-            const weekday = document.createElement("span");
-            weekday.className = "date-option__weekday";
-            weekday.textContent = formatDate(date, { weekday: "short" }).replace(".", "");
-            const day = document.createElement("span");
-            day.className = "date-option__day";
-            day.textContent = String(date.getDate()).padStart(2, "0");
-            const month = document.createElement("span");
-            month.className = "date-option__month";
-            month.textContent = formatDate(date, { month: "short" }).replace(".", "");
-            button.append(weekday, day, month);
-
+            button.innerHTML = `
+                <span class="date-option__weekday">${formatDate(date, { weekday: "short" }).replace(".", "")}</span>
+                <span class="date-option__day">${String(date.getDate()).padStart(2, "0")}</span>
+                <span class="date-option__month">${formatDate(date, { month: "short" }).replace(".", "")}</span>
+            `;
             button.addEventListener("click", async () => {
                 state.date = new Date(date);
                 state.slot = null;
-                datesContainer.querySelectorAll(".date-option").forEach((option) => {
+                $$(".date-option", datesContainer).forEach((option) => {
                     const selected = option === button;
                     option.classList.toggle("is-selected", selected);
                     option.setAttribute("aria-pressed", String(selected));
@@ -247,34 +292,19 @@
     };
 
     const loadTimes = async () => {
-        timesContainer.replaceChildren();
+        timesContainer.innerHTML = '<p class="empty-message">Consultando a agenda...</p>';
         state.slot = null;
         updateSummary();
         updateNextButton();
         if (!state.service || !state.date) return;
-
-        const loading = document.createElement("p");
-        loading.className = "empty-message";
-        loading.textContent = "Consultando a agenda...";
-        timesContainer.append(loading);
-
         try {
-            const dateString = [
-                state.date.getFullYear(),
-                String(state.date.getMonth() + 1).padStart(2, "0"),
-                String(state.date.getDate()).padStart(2, "0")
-            ].join("-");
+            const dateString = `${state.date.getFullYear()}-${String(state.date.getMonth() + 1).padStart(2, "0")}-${String(state.date.getDate()).padStart(2, "0")}`;
             const slots = await api.public.getAvailableSlots(state.service.id, dateString);
             timesContainer.replaceChildren();
-
             if (!slots?.length) {
-                const empty = document.createElement("p");
-                empty.className = "empty-message";
-                empty.textContent = "Não há horários livres nesta data. Escolha outro dia.";
-                timesContainer.append(empty);
+                timesContainer.innerHTML = '<p class="empty-message">Não há horários livres nesta data. Escolha outro dia.</p>';
                 return;
             }
-
             slots.forEach((slot) => {
                 const button = document.createElement("button");
                 button.type = "button";
@@ -283,7 +313,7 @@
                 button.setAttribute("aria-pressed", "false");
                 button.addEventListener("click", () => {
                     state.slot = slot;
-                    timesContainer.querySelectorAll(".time-option").forEach((option) => {
+                    $$(".time-option", timesContainer).forEach((option) => {
                         const selected = option === button;
                         option.classList.toggle("is-selected", selected);
                         option.setAttribute("aria-pressed", String(selected));
@@ -294,56 +324,64 @@
                 timesContainer.append(button);
             });
         } catch (error) {
-            timesContainer.replaceChildren();
-            const empty = document.createElement("p");
-            empty.className = "empty-message";
-            empty.textContent = error?.message || "Não foi possível consultar os horários agora.";
-            timesContainer.append(empty);
+            timesContainer.innerHTML = `<p class="empty-message"></p>`;
+            timesContainer.firstElementChild.textContent = error?.message || "Não foi possível consultar os horários agora.";
         }
     };
 
     const validateForm = () => {
         const accepted = form.elements.privacy.checked;
-        form.querySelector('[data-error-for="privacy"]').textContent = accepted
-            ? ""
-            : "Confirme os dados e a Política de Privacidade.";
+        const error = form.querySelector('[data-error-for="privacy"]');
+        if (error) error.textContent = accepted ? "" : "Confirme os dados e a Política de Privacidade.";
         return accepted;
     };
 
     const submit = async () => {
         if (!validateForm() || !state.service || !state.slot) return;
-        const button = form.querySelector('button[type="submit"]');
-        const original = button.textContent;
-        button.disabled = true;
-        button.textContent = "Confirmando...";
+        const original = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = state.billingMode === "online" ? "Abrindo pagamento..." : "Confirmando...";
         setStatus("");
         try {
             const result = await api.public.createAppointment({
                 serviceId: state.service.id,
                 startsAt: state.slot.starts_at,
-                notes: form.elements.note.value.trim()
+                notes: form.elements.note.value.trim(),
+                billingMode: state.billingMode
             });
+
+            if (result?.requires_checkout) {
+                try {
+                    const checkout = await api.public.createCheckout({ kind: "appointment", appointmentId: result.appointment_id });
+                    if (!checkout?.url) throw new Error("O checkout não retornou um endereço de pagamento.");
+                    window.location.assign(checkout.url);
+                    return;
+                } catch (checkoutError) {
+                    await api.customer.cancelAppointment(result.appointment_id).catch(() => null);
+                    throw checkoutError;
+                }
+            }
+
             panels.forEach((panel) => { panel.hidden = true; });
             successPanel.hidden = false;
-            progressItems.forEach((item) => {
-                item.classList.remove("is-current");
-                item.classList.add("is-complete");
-            });
+            progressItems.forEach((item) => { item.classList.remove("is-current"); item.classList.add("is-complete"); });
             setText("[data-booking-protocol]", result?.appointment_id || "confirmado");
+            setText("[data-booking-success-title]", state.billingMode === "subscription" ? "Uso do plano reservado." : "Seu horário está reservado.");
+            setText("[data-booking-success-text]", state.billingMode === "subscription"
+                ? "O atendimento aparece na sua conta como mensalista. O uso será descontado quando o serviço for concluído."
+                : "O atendimento aparece na sua conta como valor a cobrar no salão.");
             successPanel.scrollIntoView({ behavior: "smooth", block: "center" });
         } catch (error) {
             const message = String(error?.message || "");
-            if (/create_public_appointment|permission denied for function/i.test(message)) {
-                setStatus("O banco ainda está com a função antiga de agendamento. Execute a migração 007 no Supabase e tente novamente.", "error");
-            } else if (/jwt|login|sessão|session|auth/i.test(message)) {
+            if (/jwt|login|sessão|session|auth/i.test(message)) {
                 window.location.replace("minha-conta.html?acao=agendar");
                 return;
-            } else {
-                setStatus(message || "Não foi possível concluir o agendamento. O horário pode ter acabado de ser ocupado.", "error");
             }
+            setStatus(message || "Não foi possível concluir o agendamento. O horário pode ter acabado de ser ocupado.", "error");
         } finally {
-            button.disabled = false;
-            button.textContent = original;
+            submitButton.disabled = false;
+            submitButton.textContent = original;
+            updateSubmitLabel();
         }
     };
 
@@ -353,72 +391,49 @@
             if (event.target.closest("[data-previous-step]")) setStep(state.step - 1);
             if (event.target.closest("[data-restart-booking]")) window.location.reload();
         });
-        form.addEventListener("submit", (event) => {
-            event.preventDefault();
-            submit();
+        form.addEventListener("submit", (event) => { event.preventDefault(); submit(); });
+        paymentOptions?.addEventListener("change", (event) => {
+            const input = event.target.closest('input[name="billingMode"]');
+            if (!input) return;
+            state.billingMode = input.value;
+            updateSummary();
+            updateSubmitLabel();
         });
     };
 
-    const requireLogin = async () => {
+    const init = async () => {
+        showAuthGate("Verificando sua sessão...");
         try {
-            const session = await api.auth.getSession();
-            if (!session) {
+            const [account, settings, services] = await Promise.all([
+                api.customer.getOverview(),
+                api.public.getSettings(),
+                api.public.getServices()
+            ]);
+            state.account = account;
+            state.settings = settings || {};
+            state.services = services || [];
+            const customer = account.customer || {};
+            const profile = account.profile || {};
+            const phone = utils.normalizeBrazilPhone(customer.phone || profile.phone || "");
+            if (!account.customer || String(customer.name || profile.full_name || "").trim().length < 3 || !utils.isValidBrazilPhone(phone)) {
                 window.location.replace("minha-conta.html?acao=agendar");
-                return false;
+                return;
             }
-
-            state.account = await api.customer.getOverview();
-            const customer = state.account.customer || {};
-            const profile = state.account.profile || {};
-            const hasName = Boolean(String(customer.name || profile.full_name || "").trim());
-            const hasPhone = String(customer.phone || profile.phone || "").replace(/\D/g, "").length >= 10;
-            if (!state.account.customer || !hasName || !hasPhone) {
-                window.location.replace("minha-conta.html?acao=agendar#perfil");
-                return false;
-            }
-
+            state.billingMode = activeSubscription() ? "subscription" : (state.settings.online_payments_enabled ? "online" : "salon");
             showBooking();
             showAccount();
-            return true;
-        } catch (error) {
-            if (error?.name === "BackendNotConfiguredError") {
-                showAuthGate(config.backend.missingMessage);
-                return false;
-            }
-            window.location.replace("minha-conta.html?acao=agendar");
-            return false;
-        }
-    };
-
-    const start = async () => {
-        bindEvents();
-        setStatus("Validando sua conta...", "info");
-        if (!(await requireLogin())) return;
-
-        try {
-            const [services, settings] = await Promise.all([
-                api.public.getServices(),
-                api.public.getSettings()
-            ]);
-            state.services = services || [];
-            state.settings = settings || null;
             renderServices();
             renderDates();
             updateSummary();
-            updateProgress();
-            updateNextButton();
-            setStatus("");
+            bindEvents();
         } catch (error) {
-            renderServices();
-            setStatus(error?.name === "BackendNotConfiguredError"
-                ? config.backend.missingMessage
-                : (error?.message || config.backend.genericError), "error");
+            if (/login|sessão|session|auth/i.test(String(error?.message || ""))) {
+                window.location.replace(`login.html?redirect=${encodeURIComponent("minha-conta.html?acao=agendar")}`);
+                return;
+            }
+            showAuthGate(error?.message || "Não foi possível carregar sua conta.");
         }
     };
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", start, { once: true });
-    } else {
-        start();
-    }
+    init();
 })();

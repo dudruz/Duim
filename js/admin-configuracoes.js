@@ -4,6 +4,7 @@
     const api = window.DuAmigoAPI;
     const admin = window.DuAmigoAdmin;
     await admin.initPromise;
+    const utils = window.DuAmigoUtils;
 
     const form = document.querySelector("[data-settings-form]");
     let settings = null;
@@ -31,11 +32,20 @@
         payload.id = settings.id;
         payload.accepting_bookings = form.elements.accepting_bookings.checked;
         payload.store_enabled = form.elements.store_enabled.checked;
+        payload.online_payments_enabled = form.elements.online_payments_enabled.checked;
+        payload.subscription_sales_enabled = form.elements.subscription_sales_enabled.checked;
         payload.booking_window_days = Number(payload.booking_window_days || 30);
         payload.booking_notice_minutes = Number(payload.booking_notice_minutes || 0);
         payload.cancellation_notice_hours = Number(payload.cancellation_notice_hours || 0);
         payload.slot_interval_minutes = Number(payload.slot_interval_minutes || 10);
-        payload.phone_digits = String(payload.phone_digits || "").replace(/\D/g, "").slice(-11);
+        payload.online_payment_hold_minutes = Number(payload.online_payment_hold_minutes || 15);
+        payload.phone_digits = utils.normalizeBrazilPhone(payload.phone_digits || payload.phone_display);
+        if (payload.phone_digits && !utils.isValidBrazilPhone(payload.phone_digits)) {
+            admin.showToast("Informe um WhatsApp válido com DDD.", "error");
+            admin.setLoading(submit, false);
+            return;
+        }
+        payload.phone_display = utils.formatBrazilPhone(payload.phone_digits);
 
         try {
             settings = await api.admin.saveSettings(payload);

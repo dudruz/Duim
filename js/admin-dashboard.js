@@ -48,6 +48,8 @@
             document.querySelector("[data-metric-today]").textContent = data.todayCount;
             document.querySelector("[data-metric-customers]").textContent = data.customersCount;
             document.querySelector("[data-metric-balance]").textContent = admin.formatCurrency(data.monthBalance);
+            document.querySelector("[data-metric-subscriptions]").textContent = String(data.pendingSubscriptionCount || 0);
+            document.querySelector("[data-metric-subscriptions-value]").textContent = admin.formatCurrency(data.pendingSubscriptionValue || 0);
             document.querySelector("[data-metric-next]").textContent = data.appointments.find((item) =>
                 ["pending", "confirmed"].includes(item.status) && new Date(item.starts_at) > new Date()
             ) ? admin.formatTime(data.appointments.find((item) =>

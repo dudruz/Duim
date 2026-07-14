@@ -48,7 +48,7 @@ barbearia-du-amigo/
 
 ## Configuração rápida
 
-1. Execute os SQLs de `supabase/migrations/` na ordem, do `001` ao `007`.
+1. Execute os SQLs de `supabase/migrations/` na ordem, do `001` ao `009`.
 2. Crie o usuário administrador.
 3. Execute `supabase/bootstrap-admin.sql.example` com o UUID.
 4. Preencha `js/env.js`.
@@ -67,3 +67,22 @@ O navegador usa somente a anon key. A service role não deve ser colocada no fro
 O cadastro não exige confirmação de e-mail. Todo botão **Agendar** passa pela **Minha conta**, verifica a sessão e o perfil e, quando necessário, mostra **Entrar** ou **Criar conta**. Após o cadastro, a sessão é iniciada automaticamente e o cliente segue para serviços, dias e horários.
 
 Antes de testar, desative **Confirm email** em **Supabase > Authentication > Providers > Email**. Veja `docs/INSTALACAO.md`.
+
+
+## Correção v12 — telefones brasileiros
+
+O projeto normaliza telefones com ou sem o código do país `55`, salva somente DDD + número e monta links do WhatsApp sem duplicar o prefixo. Execute `supabase/migrations/008_normalize_brazil_phone.sql` em instalações já existentes.
+
+## Etapa 13 — pagamentos, mensalistas e mobile
+
+Esta versão adiciona:
+
+- escolha entre **Pré-pago**, **Mensalista** e **A cobrar no salão** no agendamento;
+- checkout InfinitePay por Edge Functions do Supabase;
+- confirmação automática por webhook;
+- contratação de mensalidade online ou em dinheiro;
+- painel do Duin para aprovar mensalidades em dinheiro;
+- financeiro com recebido, a receber no salão, pré-pago online, mensalistas ativos e projeção;
+- correções mobile para botões, cards de data, formulários e navegação inferior.
+
+Execute a migração `009_payments_subscriptions_mobile.sql` e siga `docs/INFINITEPAY.md`.

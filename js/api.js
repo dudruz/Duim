@@ -2,6 +2,7 @@
 
 (() => {
     const backend = window.DuAmigoBackend;
+    const utils = window.DuAmigoUtils;
 
     const getClient = () => backend.getClient();
 
@@ -16,7 +17,7 @@
         return { start: start.toISOString(), end: end.toISOString() };
     };
 
-    const normalizePhone = (value = "") => value.replace(/\D/g, "").slice(-11);
+    const normalizePhone = (value = "") => utils?.normalizeBrazilPhone(value) || String(value).replace(/\D/g, "").slice(-11);
 
     const publicApi = {
         async getSettings() {
@@ -65,12 +66,33 @@
 
         async createAppointment(payload) {
             const client = getClient();
-            const data = throwIfError(await client.rpc("create_customer_appointment", {
+            const data = throwIfError(await client.rpc("create_customer_appointment_v2", {
                 p_service_id: payload.serviceId,
                 p_starts_at: payload.startsAt,
-                p_notes: payload.notes || null
+                p_notes: payload.notes || null,
+                p_billing_mode: payload.billingMode || "salon"
             }));
             return Array.isArray(data) ? data[0] : data;
+        },
+
+        async createCheckout(payload) {
+            const client = getClient();
+            const { data, error } = await client.functions.invoke("create-infinitepay-checkout", {
+                body: payload
+            });
+            if (error) throw new Error(data?.error || error.message || "Não foi possível iniciar o pagamento.");
+            if (data?.error) throw new Error(data.error);
+            return data;
+        },
+
+        async verifyPayment(payload) {
+            const client = getClient();
+            const { data, error } = await client.functions.invoke("verify-infinitepay-payment", {
+                body: payload
+            });
+            if (error) throw new Error(data?.error || error.message || "Não foi possível verificar o pagamento.");
+            if (data?.error) throw new Error(data.error);
+            return data;
         }
     };
 
@@ -200,20 +222,57 @@
                 .order("created_at", { ascending: false }));
         },
 
+        async getPlans() {
+            const client = getClient();
+            return throwIfError(await client
+                .from("plans")
+                .select("*")
+                .eq("active", true)
+                .order("price", { ascending: true }));
+        },
+
+        async getSubscriptionRequests() {
+            const client = getClient();
+            return throwIfError(await client
+                .from("subscription_requests")
+                .select(`
+                    *,
+                    plans(id, name, description, price, billing_cycle, cuts_included)
+                `)
+                .order("requested_at", { ascending: false }));
+        },
+
+        async requestSubscription(planId, paymentChoice) {
+            const client = getClient();
+            const data = throwIfError(await client.rpc("create_subscription_request", {
+                p_plan_id: planId,
+                p_payment_choice: paymentChoice
+            }));
+            return Array.isArray(data) ? data[0] : data;
+        },
+
         async getOverview() {
             const { user, profile } = await authApi.requireCustomer();
-            const [customer, appointments, subscriptions] = await Promise.all([
+            const client = getClient();
+            const [customer, appointments, subscriptions, plans, subscriptionRequests, settingsResult] = await Promise.all([
                 this.getCustomer(),
                 this.getAppointments(),
-                this.getSubscriptions()
+                this.getSubscriptions(),
+                this.getPlans(),
+                this.getSubscriptionRequests(),
+                client.from("settings").select("online_payments_enabled, subscription_sales_enabled").limit(1).maybeSingle()
             ]);
+            if (settingsResult.error) throw settingsResult.error;
 
             return {
                 user,
                 profile,
                 customer,
                 appointments: appointments || [],
-                subscriptions: subscriptions || []
+                subscriptions: subscriptions || [],
+                plans: plans || [],
+                subscriptionRequests: subscriptionRequests || [],
+                settings: settingsResult.data || {}
             };
         },
 
@@ -238,7 +297,8 @@
                 appointmentsResult,
                 todayCountResult,
                 customersCountResult,
-                monthMovementsResult
+                monthMovementsResult,
+                subscriptionRequestsResult
             ] = await Promise.all([
                 client
                     .from("appointments")
@@ -263,10 +323,14 @@
                     .from("cash_movements")
                     .select("type, amount")
                     .gte("movement_date", monthStart.slice(0, 10))
-                    .lt("movement_date", monthEndDate.toISOString().slice(0, 10))
+                    .lt("movement_date", monthEndDate.toISOString().slice(0, 10)),
+                client
+                    .from("subscription_requests")
+                    .select("id, amount", { count: "exact" })
+                    .eq("status", "pending_approval")
             ]);
 
-            [appointmentsResult, todayCountResult, customersCountResult, monthMovementsResult]
+            [appointmentsResult, todayCountResult, customersCountResult, monthMovementsResult, subscriptionRequestsResult]
                 .forEach(({ error }) => { if (error) throw error; });
 
             const monthBalance = (monthMovementsResult.data || []).reduce((total, movement) => {
@@ -278,7 +342,9 @@
                 appointments: appointmentsResult.data || [],
                 todayCount: todayCountResult.count || 0,
                 customersCount: customersCountResult.count || 0,
-                monthBalance
+                monthBalance,
+                pendingSubscriptionCount: subscriptionRequestsResult.count || 0,
+                pendingSubscriptionValue: (subscriptionRequestsResult.data || []).reduce((total, item) => total + Number(item.amount || 0), 0)
             };
         },
 
@@ -314,7 +380,7 @@
 
         async updateAppointment(id, changes) {
             const client = getClient();
-            return throwIfError(await client
+            const appointment = throwIfError(await client
                 .from("appointments")
                 .update(changes)
                 .eq("id", id)
@@ -324,6 +390,22 @@
                     customers(id, name, nickname, phone, email, style_preferences)
                 `)
                 .single());
+
+            if (Object.prototype.hasOwnProperty.call(changes, "payment_status")
+                || Object.prototype.hasOwnProperty.call(changes, "payment_method")) {
+                const paymentChanges = {};
+                if (Object.prototype.hasOwnProperty.call(changes, "payment_status")) {
+                    paymentChanges.status = changes.payment_status;
+                    paymentChanges.paid_at = changes.payment_status === "paid" ? new Date().toISOString() : null;
+                }
+                if (Object.prototype.hasOwnProperty.call(changes, "payment_method")) {
+                    paymentChanges.method = changes.payment_method || null;
+                }
+                const paymentResult = await client.from("payments").update(paymentChanges).eq("appointment_id", id);
+                if (paymentResult.error) throw paymentResult.error;
+            }
+
+            return appointment;
         },
 
         async createManualAppointment(payload) {
@@ -532,6 +614,44 @@
             return throwIfError(await query);
         },
 
+        async getFinanceOverview({ startDate, endDate } = {}) {
+            const client = getClient();
+            const startIso = startDate ? `${startDate}T00:00:00` : null;
+            const endIso = endDate ? `${endDate}T23:59:59.999` : null;
+
+            let appointmentsQuery = client
+                .from("appointments")
+                .select("id, starts_at, status, total_amount, payment_status, payment_method, billing_mode, customers(name), services(name)")
+                .neq("status", "cancelled");
+            let paymentsQuery = client
+                .from("payments")
+                .select("id, amount, status, paid_at, method, provider, appointment_id, subscription_id")
+                .eq("status", "paid");
+            if (startIso) appointmentsQuery = appointmentsQuery.gte("starts_at", startIso);
+            if (endIso) appointmentsQuery = appointmentsQuery.lte("starts_at", endIso);
+            if (startIso) paymentsQuery = paymentsQuery.gte("paid_at", startIso);
+            if (endIso) paymentsQuery = paymentsQuery.lte("paid_at", endIso);
+
+            const [movements, appointmentsResult, paymentsResult, subscriptionsResult, requestsResult] = await Promise.all([
+                this.getCashMovements({ startDate, endDate }),
+                appointmentsQuery,
+                paymentsQuery,
+                client.from("subscriptions")
+                    .select("id, status, remaining_uses, ends_on, plans(name, price), customers(name)")
+                    .eq("status", "active")
+                    .or(`ends_on.is.null,ends_on.gte.${new Date().toISOString().slice(0, 10)}`),
+                client.from("subscription_requests").select("id, status, amount, payment_choice, customers(name), plans(name)").in("status", ["pending_approval", "pending_payment"])
+            ]);
+            [appointmentsResult, paymentsResult, subscriptionsResult, requestsResult].forEach(({ error }) => { if (error) throw error; });
+            return {
+                movements: movements || [],
+                appointments: appointmentsResult.data || [],
+                payments: paymentsResult.data || [],
+                subscriptions: subscriptionsResult.data || [],
+                requests: requestsResult.data || []
+            };
+        },
+
         async saveCashMovement(payload) {
             const client = getClient();
             return throwIfError(await client
@@ -596,6 +716,30 @@
                     plans(id, name, price, cuts_included)
                 `)
                 .order("created_at", { ascending: false }));
+        },
+
+        async getSubscriptionRequests(status = "") {
+            const client = getClient();
+            let query = client
+                .from("subscription_requests")
+                .select(`
+                    *,
+                    customers(id, name, nickname, phone, email),
+                    plans(id, name, price, cuts_included)
+                `)
+                .order("requested_at", { ascending: false });
+            if (status) query = query.eq("status", status);
+            return throwIfError(await query);
+        },
+
+        async reviewSubscriptionRequest(id, approve, note = "") {
+            const client = getClient();
+            const data = throwIfError(await client.rpc("review_subscription_request", {
+                p_request_id: id,
+                p_approve: Boolean(approve),
+                p_note: note || null
+            }));
+            return Array.isArray(data) ? data[0] : data;
         },
 
         async saveSubscription(payload) {

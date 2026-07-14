@@ -25,7 +25,7 @@
         setText("[data-business-name]", business.name, config.business.name);
         setText("[data-barber-name]", business.barberName, config.business.barberName);
         setText("[data-business-address]", business.address, config.business.address);
-        setText("[data-business-phone]", business.phoneDisplay, "Ainda não informado");
+        setText("[data-business-phone]", business.phoneDisplay || utils.formatBrazilPhone(business.phoneDigits), "Ainda não informado");
         setText("[data-business-hours]", business.openingHours, "Consulte a agenda online");
         setText("[data-current-year]", String(new Date().getFullYear()));
 
@@ -34,14 +34,15 @@
         });
 
         document.querySelectorAll("[data-business-phone-link]").forEach((link) => {
-            if (!business.phoneDigits) {
+            const whatsappDigits = utils.toWhatsAppDigits(business.phoneDigits || business.phoneDisplay);
+            if (!whatsappDigits) {
                 link.removeAttribute("href");
                 link.setAttribute("aria-disabled", "true");
                 link.classList.add("is-disabled");
                 return;
             }
 
-            link.href = `https://wa.me/55${business.phoneDigits}`;
+            link.href = `https://wa.me/${whatsappDigits}`;
             link.removeAttribute("aria-disabled");
             link.classList.remove("is-disabled");
         });

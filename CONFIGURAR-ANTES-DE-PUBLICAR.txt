@@ -1,16 +1,49 @@
-BARBEARIA DU AMIGO — CONFIGURAÇÃO ANTES DE PUBLICAR
+BARBEARIA DU AMIGO — CONFIGURAÇÃO FINAL
+GitHub Pages + Supabase + InfinitePay
 
-1. Supabase > Authentication > Providers > Email
+1. SUPABASE AUTH
+   Authentication > Providers > Email
    Desative: Confirm email
 
-2. Exclua usuários de teste criados antes dessa alteração.
+2. FRONTEND
+   Preencha js/env.js com a PUBLISHABLE KEY ou ANON KEY.
+   A URL já está configurada: https://zglooskfheyjlcbpgbwh.supabase.co
+   Nunca coloque service_role no GitHub.
 
-3. Preencha js/env.js com a ANON KEY ou PUBLISHABLE KEY.
-   Nunca use a service_role.
+3. BANCO DE DADOS
+   Execute as migrações 001 até 009, na ordem, no SQL Editor.
+   Em projeto que já possui 001–008, execute somente:
+   supabase/migrations/009_payments_subscriptions_mobile.sql
 
-4. Execute as migrações 001 até 007 no SQL Editor.
+4. ADMINISTRADOR
+   Crie o usuário do Duin em Authentication > Users.
+   Execute supabase/bootstrap-admin.sql.example usando o UUID dele.
 
-5. Configure a URL do GitHub Pages em Authentication > URL Configuration.
+5. INFINITEPAY
+   Habilite o Checkout Integrado no app/site da InfinitePay.
+   Separe a InfiniteTag sem o símbolo $.
 
-6. Teste em aba anônima:
-   Agendar > Criar conta > Minha conta > escolher horário.
+6. EDGE FUNCTIONS
+   Na pasta do projeto, execute:
+
+   npx supabase login
+   npx supabase link --project-ref zglooskfheyjlcbpgbwh
+   npx supabase secrets set INFINITEPAY_HANDLE=SUA_INFINITETAG PUBLIC_SITE_URL=https://dudruz.github.io --project-ref zglooskfheyjlcbpgbwh
+   npx supabase functions deploy create-infinitepay-checkout --project-ref zglooskfheyjlcbpgbwh
+   npx supabase functions deploy verify-infinitepay-payment --project-ref zglooskfheyjlcbpgbwh
+   npx supabase functions deploy infinitepay-webhook --project-ref zglooskfheyjlcbpgbwh
+
+   Se o site estiver em uma subpasta do GitHub Pages, use a URL completa em PUBLIC_SITE_URL.
+
+7. PAINEL DO DUIN
+   Configurações > ative:
+   - Permitir pré-pagamento pela InfinitePay
+   - Permitir contratação de mensalidade
+
+8. TESTES OBRIGATÓRIOS
+   - Agendamento para pagar no salão.
+   - Agendamento pré-pago com Pix/cartão.
+   - Mensalidade paga online e ativada pelo webhook.
+   - Mensalidade em dinheiro aprovada no painel Planos.
+   - Financeiro: recebido, a receber no salão e projeção.
+   - Teste mobile em iPhone e Android.
