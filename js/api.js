@@ -6,9 +6,41 @@
 
     const getClient = () => backend.getClient();
 
-    const throwIfError = ({ data, error }) => {
-        if (error) throw error;
+    const formatBackendError = (error, fallback = "Não foi possível concluir a operação.") => {
+        if (!error) return new Error(fallback);
+        console.error("[Barbearia du Amigo · Supabase]", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            error
+        });
+        const message = error.message || error.details || error.hint || fallback;
+        const normalized = new Error(message);
+        normalized.code = error.code;
+        normalized.details = error.details;
+        normalized.hint = error.hint;
+        return normalized;
+    };
+
+    const throwIfError = ({ data, error }, fallback) => {
+        if (error) throw formatBackendError(error, fallback);
         return data;
+    };
+
+    const readFunctionError = async (error, data, fallback) => {
+        let message = data?.error || data?.message || "";
+        const response = error?.context;
+        if (!message && response && typeof response.clone === "function") {
+            try {
+                const body = await response.clone().json();
+                message = body?.error || body?.message || "";
+            } catch (_) {
+                // A resposta pode não ser JSON.
+            }
+        }
+        console.error("[Barbearia du Amigo · Edge Function]", { error, data, message });
+        return new Error(message || error?.message || fallback);
     };
 
     const localDateRange = (dateString) => {
@@ -66,7 +98,7 @@
 
         async createAppointment(payload) {
             const client = getClient();
-            const data = throwIfError(await client.rpc("create_customer_appointment_v2", {
+            const data = throwIfError(await client.rpc("create_customer_appointment_v3", {
                 p_service_id: payload.serviceId,
                 p_starts_at: payload.startsAt,
                 p_notes: payload.notes || null,
@@ -80,7 +112,7 @@
             const { data, error } = await client.functions.invoke("create-infinitepay-checkout", {
                 body: payload
             });
-            if (error) throw new Error(data?.error || error.message || "Não foi possível iniciar o pagamento.");
+            if (error) throw await readFunctionError(error, data, "Não foi possível iniciar o pagamento.");
             if (data?.error) throw new Error(data.error);
             return data;
         },
@@ -90,7 +122,7 @@
             const { data, error } = await client.functions.invoke("verify-infinitepay-payment", {
                 body: payload
             });
-            if (error) throw new Error(data?.error || error.message || "Não foi possível verificar o pagamento.");
+            if (error) throw await readFunctionError(error, data, "Não foi possível verificar o pagamento.");
             if (data?.error) throw new Error(data.error);
             return data;
         }
@@ -170,7 +202,23 @@
             const user = await this.getUser();
             if (!user) throw new Error("Faça login para continuar.");
 
-            const profile = await this.getProfile(user.id);
+            let profile = await this.getProfile(user.id);
+            if (!profile) {
+                const fullName = String(user.user_metadata?.full_name || "").trim();
+                const phone = normalizePhone(user.user_metadata?.phone || "");
+                if (fullName.length >= 3 && utils?.isValidBrazilPhone(phone)) {
+                    const client = getClient();
+                    await throwIfError(await client.rpc("sync_own_customer_profile_v2", {
+                        p_full_name: fullName,
+                        p_phone: phone,
+                        p_nickname: null,
+                        p_birth_date: null,
+                        p_style_preferences: null
+                    }));
+                    profile = await this.getProfile(user.id);
+                }
+            }
+
             if (!profile || !profile.active) {
                 throw new Error("Esta conta não está disponível.");
             }
@@ -182,7 +230,7 @@
     const customerApi = {
         async syncProfile(payload) {
             const client = getClient();
-            const data = throwIfError(await client.rpc("sync_own_customer_profile", {
+            const data = throwIfError(await client.rpc("sync_own_customer_profile_v2", {
                 p_full_name: String(payload.fullName || "").trim(),
                 p_phone: normalizePhone(payload.phone),
                 p_nickname: String(payload.nickname || "").trim() || null,
@@ -190,6 +238,11 @@
                 p_style_preferences: String(payload.stylePreferences || "").trim() || null
             }));
             return Array.isArray(data) ? data[0] : data;
+        },
+
+        async ensureCustomer() {
+            const client = getClient();
+            return throwIfError(await client.rpc("ensure_own_customer_v2"), "Não foi possível vincular sua conta ao cadastro de cliente.");
         },
 
         async getCustomer() {
@@ -244,7 +297,7 @@
 
         async requestSubscription(planId, paymentChoice) {
             const client = getClient();
-            const data = throwIfError(await client.rpc("create_subscription_request", {
+            const data = throwIfError(await client.rpc("create_subscription_request_v2", {
                 p_plan_id: planId,
                 p_payment_choice: paymentChoice
             }));
@@ -256,16 +309,14 @@
             const client = getClient();
             let customer = await this.getCustomer();
 
-            // Contas antigas podiam possuir profile correto, mas nenhum registro vinculado
-            // em customers. Depois da migração 010, esta chamada repara o vínculo sozinha.
+            // Repara automaticamente contas antigas que possuem nome e telefone, mas
+            // ainda não estão vinculadas à tabela customers.
             if (!customer) {
-                const profileName = String(profile?.full_name || user?.user_metadata?.full_name || "").trim();
-                const profilePhone = normalizePhone(profile?.phone || user?.user_metadata?.phone || "");
-                if (profileName.length >= 3 && utils?.isValidBrazilPhone(profilePhone)) {
-                    customer = await this.syncProfile({
-                        fullName: profileName,
-                        phone: profilePhone
-                    });
+                try {
+                    customer = await this.ensureCustomer();
+                } catch (error) {
+                    const incomplete = /complete nome|whatsapp|dados/i.test(String(error?.message || ""));
+                    if (!incomplete) throw error;
                 }
             }
 

@@ -534,6 +534,10 @@
             try {
                 const request = await api.customer.requestSubscription(button.dataset.planOnline || button.dataset.planCash, online ? "online" : "cash");
                 if (online) {
+                    if (request?.checkout_url) {
+                        window.location.assign(request.checkout_url);
+                        return;
+                    }
                     const checkout = await api.public.createCheckout({ kind: "subscription", subscriptionRequestId: request.request_id });
                     if (!checkout?.url) throw new Error("Não foi possível abrir o checkout.");
                     window.location.assign(checkout.url);
@@ -542,6 +546,7 @@
                 await load();
                 setStatus("Solicitação enviada ao Duin. O plano será ativado após ele confirmar o pagamento em dinheiro.", "success");
             } catch (error) {
+                try { await load(); } catch (_) {}
                 setStatus(error?.message || "Não foi possível solicitar o plano.", "error");
             } finally {
                 button.disabled = false;
