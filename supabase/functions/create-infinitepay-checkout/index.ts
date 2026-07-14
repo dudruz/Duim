@@ -90,7 +90,11 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Este pagamento já foi confirmado.", paid: true }, 409);
     }
 
-    const redirectUrl = `${siteUrl}/pages/pagamento.html`;
+    const requestedRedirectUrl = String(body.redirectUrl || "").trim();
+    const allowedPrefix = `${siteUrl}/`;
+    const redirectUrl = requestedRedirectUrl.startsWith(allowedPrefix)
+      ? requestedRedirectUrl
+      : `${siteUrl}/pages/pagamento.html`;
     const webhookUrl = `${supabaseUrl}/functions/v1/infinitepay-webhook`;
     const link = await createInfinitePayLink({
       handle,

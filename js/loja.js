@@ -38,7 +38,10 @@
         showToast.timer = setTimeout(() => { elements.toast.hidden = true; }, 4200);
     };
 
-    const productImage = (product) => product.image_url || "../assets/images/product-placeholder.svg";
+    const productImage = (product) => utils.resolveAssetUrl(
+        product.image_url,
+        "assets/images/product-placeholder.svg"
+    );
 
     const createCard = (product) => {
         const article = document.createElement("article");

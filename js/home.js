@@ -7,7 +7,7 @@
 
     if (!api || !config || !utils) return;
 
-    const asset = (path, fallback) => path || fallback;
+    const asset = (path, fallback) => utils.resolveAssetUrl(path, fallback);
 
     const createServiceCard = (service) => {
         const article = utils.createElement("article", { className: "service-card" });

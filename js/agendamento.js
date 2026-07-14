@@ -225,8 +225,11 @@
         currentPanel()?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
-    const serviceIcon = (service) => service.icon_path || (
-        service.name.toLowerCase().includes("barba") ? "../assets/icons/beard.svg" : "../assets/icons/scissors.svg"
+    const serviceIcon = (service) => utils.resolveAssetUrl(
+        service.icon_path,
+        service.name.toLowerCase().includes("barba")
+            ? "assets/icons/beard.svg"
+            : "assets/icons/scissors.svg"
     );
 
     const renderServices = () => {

@@ -8,6 +8,25 @@ window.DuAmigoUtils = (() => {
 
     const formatCurrency = (value) => currencyFormatter.format(Number(value) || 0);
 
+    // Resolve caminhos salvos no banco (ex.: assets/icons/scissors.svg) a partir
+    // da raiz real do projeto. Isso funciona tanto na raiz quanto em /pages,
+    // /admin e em subpastas do GitHub Pages, como /Duim/.
+    const utilsScriptUrl = document.currentScript?.src || new URL("js/utils.js", window.location.href).href;
+    const projectRootUrl = new URL("../", utilsScriptUrl);
+
+    const resolveAssetUrl = (value = "", fallback = "") => {
+        const candidate = String(value || fallback || "").trim();
+        if (!candidate) return "";
+        if (/^(?:https?:|data:|blob:)/i.test(candidate)) return candidate;
+        if (candidate.startsWith("/")) return new URL(candidate, window.location.origin).href;
+
+        const cleanPath = candidate
+            .replace(/^(?:\.\.\/)+/, "")
+            .replace(/^\.\//, "");
+
+        return new URL(cleanPath, projectRootUrl).href;
+    };
+
     const formatDuration = (minutes) => {
         const total = Number(minutes) || 0;
         const hours = Math.floor(total / 60);
@@ -102,6 +121,7 @@ window.DuAmigoUtils = (() => {
 
     return Object.freeze({
         formatCurrency,
+        resolveAssetUrl,
         formatDuration,
         normalizeBrazilPhone,
         isValidBrazilPhone,

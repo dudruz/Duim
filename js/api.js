@@ -109,8 +109,9 @@
 
         async createCheckout(payload) {
             const client = getClient();
+            const redirectUrl = new URL("pagamento.html", window.location.href).href;
             const { data, error } = await client.functions.invoke("create-infinitepay-checkout", {
-                body: payload
+                body: { ...payload, redirectUrl }
             });
             if (error) throw await readFunctionError(error, data, "Não foi possível iniciar o pagamento.");
             if (data?.error) throw new Error(data.error);

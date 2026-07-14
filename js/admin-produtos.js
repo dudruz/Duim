@@ -28,9 +28,10 @@
         }
 
         products.forEach((product) => {
-            const safeImage = /^https:\/\//i.test(product.image_url || "")
-                ? product.image_url
-                : "../assets/images/product-placeholder.svg";
+            const safeImage = window.DuAmigoUtils.resolveAssetUrl(
+                product.image_url,
+                "assets/images/product-placeholder.svg"
+            );
             const card = document.createElement("article");
             card.className = "product-management-card";
             card.innerHTML = `
