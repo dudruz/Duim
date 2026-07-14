@@ -1,0 +1,223 @@
+@media (max-width: 900px) {
+    :root {
+        --header-height: 68px;
+    }
+
+    .menu-toggle {
+        display: grid;
+    }
+
+    .main-nav {
+        position: fixed;
+        z-index: var(--z-menu);
+        top: calc(var(--header-height) + 0.65rem);
+        right: var(--gutter);
+        left: var(--gutter);
+        display: grid;
+        align-items: stretch;
+        gap: 0;
+        overflow: hidden;
+        padding: 0.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: rgba(19, 19, 22, 0.98);
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-0.75rem) scale(0.98);
+        transform-origin: top;
+        transition:
+            opacity var(--transition-base),
+            transform var(--transition-base);
+    }
+
+    .main-nav.is-open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+
+    .main-nav > a:not(.button) {
+        padding: 0.95rem 1rem;
+        border-radius: var(--radius-sm);
+        color: var(--color-text-soft);
+    }
+
+    .main-nav > a:not(.button)::after {
+        display: none;
+    }
+
+    .main-nav > a:not(.button):hover,
+    .main-nav > a:not(.button).is-active {
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .main-nav .button {
+        margin-top: 0.35rem;
+    }
+
+    .services-grid,
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about-layout,
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .about-layout__media {
+        order: 2;
+    }
+
+    .about-layout__content {
+        order: 1;
+    }
+
+    .image-placeholder {
+        min-height: 360px;
+    }
+
+    .section-heading--inline {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    :root {
+        --gutter: 1rem;
+        --section-space: 4.5rem;
+    }
+
+    body {
+        line-height: 1.55;
+    }
+
+    h1 {
+        font-size: clamp(3.3rem, 17vw, 5.2rem);
+    }
+
+    h2 {
+        font-size: clamp(2.4rem, 12vw, 3.75rem);
+    }
+
+    .brand__text {
+        font-size: 0.82rem;
+    }
+
+    .hero {
+        min-height: 760px;
+        align-items: end;
+        padding-bottom: 3.5rem;
+    }
+
+    .hero::before {
+        width: 88vw;
+        opacity: 0.42;
+        right: -30vw;
+        bottom: 4%;
+    }
+
+    .hero::after {
+        width: 85vw;
+        right: -35vw;
+        bottom: -5%;
+    }
+
+    .hero__content {
+        gap: 1.1rem;
+    }
+
+    .hero__description {
+        max-width: 35ch;
+    }
+
+    .hero__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .main-nav .button {
+        width: auto;
+    }
+
+    .services-grid,
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-card,
+    .product-card {
+        min-height: 230px;
+    }
+
+    .section-heading--inline {
+        display: grid;
+        align-items: start;
+    }
+
+    .image-placeholder {
+        min-height: 310px;
+    }
+
+    .cta-card {
+        min-height: 360px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-end;
+    }
+
+    .cta-card::before {
+        top: -8rem;
+        right: -7rem;
+    }
+
+    .site-footer__content {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding-block: 1.75rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .brand__text {
+        display: none;
+    }
+
+    .hero {
+        min-height: 700px;
+    }
+
+    .contact-card p {
+        padding-inline: 1rem;
+    }
+}
+
+@media (hover: none) {
+    .service-card:hover,
+    .product-card:hover,
+    .button:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .service-card__details,
+    .product-card__footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-card:not(.service-card--placeholder) {
+        min-height: 285px;
+    }
+}

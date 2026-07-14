@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Produtos | Painel Duin</title>
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-admin-page="produtos">
+    <div class="admin-shell" data-admin-shell>
+        <aside class="admin-sidebar">
+            <a class="admin-sidebar__brand" href="dashboard.html">
+                <img src="../assets/images/logo-oficial.png" alt="">
+                <span><strong>Barbearia du Amigo</strong><span>Painel do Duin</span></span>
+            </a>
+
+            <nav class="admin-navigation" aria-label="Navegação do painel">
+                <span class="admin-navigation__label">Visão geral</span>
+                <a href="dashboard.html" data-admin-nav="dashboard"><img src="../assets/icons/grid.svg" alt="">Dashboard</a>
+                <a href="agenda.html" data-admin-nav="agenda"><img src="../assets/icons/calendar.svg" alt="">Agenda</a>
+                <a href="clientes.html" data-admin-nav="clientes"><img src="../assets/icons/user.svg" alt="">Clientes</a>
+
+                <span class="admin-navigation__label">Operação</span>
+                <a href="servicos.html" data-admin-nav="servicos"><img src="../assets/icons/scissors.svg" alt="">Serviços</a>
+                <a href="produtos.html" data-admin-nav="produtos"><img src="../assets/icons/package.svg" alt="">Produtos</a>
+                <a href="financeiro.html" data-admin-nav="financeiro"><img src="../assets/icons/wallet.svg" alt="">Financeiro</a>
+                <a href="planos.html" data-admin-nav="planos"><img src="../assets/icons/star.svg" alt="">Planos</a>
+
+                <span class="admin-navigation__label">Sistema</span>
+                <a href="horarios.html" data-admin-nav="horarios"><img src="../assets/icons/clock.svg" alt="">Horários e folgas</a>
+                <a href="configuracoes.html" data-admin-nav="configuracoes"><img src="../assets/icons/edit.svg" alt="">Configurações</a>
+                <a href="../index.html" target="_blank"><img src="../assets/icons/home.svg" alt="">Abrir site</a>
+            </nav>
+
+            <div class="admin-sidebar__footer">
+                <div class="admin-user">
+                    <span class="admin-user__avatar">D</span>
+                    <span><strong data-admin-name>Duin</strong><span data-admin-email></span></span>
+                </div>
+                <button class="admin-logout" type="button" data-admin-logout>Sair do painel</button>
+            </div>
+        </aside>
+
+        <button class="admin-backdrop" type="button" aria-label="Fechar menu" data-admin-backdrop></button>
+
+        <div class="admin-workspace">
+            <header class="admin-topbar">
+                <div style="display:flex;align-items:center;gap:.8rem">
+                    <button class="admin-menu-button" type="button" aria-label="Abrir menu" data-admin-menu>☰</button>
+                    <div>
+                        <h1>Produtos</h1>
+                        <p>Catálogo da Barbearia du Amigo</p>
+                    </div>
+                </div>
+                <div class="admin-topbar__user">
+                    <strong data-admin-name>Duin</strong>
+                </div>
+            </header>
+
+            <main class="admin-main">
+
+<section class="admin-page-heading">
+    <div><h2>Produtos</h2><p>Catálogo público, estoque e imagens.</p></div>
+    <button class="button button--primary" type="button" data-new-product>Novo produto</button>
+</section>
+
+<section class="management-grid" data-products-admin></section>
+
+<dialog class="admin-modal" data-product-admin-modal>
+    <div class="admin-modal__header"><h2>Produto</h2><button class="admin-modal__close" type="button" data-close-modal>×</button></div>
+    <form class="admin-form" data-product-admin-form>
+        <input name="id" type="hidden">
+        <input name="image_url" type="hidden">
+        <div class="form-grid">
+            <div class="form-field"><label>Nome</label><input name="name" required></div>
+            <div class="form-field"><label>Identificador</label><input name="slug" required></div>
+            <div class="form-field"><label>Categoria</label><input name="category" required placeholder="Cabelo, Barba..."></div>
+            <div class="form-field"><label>Preço</label><input name="price" type="number" min="0" step="0.01" required></div>
+            <div class="form-field form-field--full"><label>Descrição curta</label><textarea name="description"></textarea></div>
+            <div class="form-field form-field--full"><label>Detalhes</label><textarea name="details"></textarea></div>
+            <div class="form-field"><label>Situação</label>
+                <select name="stock_status"><option value="available">Disponível</option><option value="out_of_stock">Em reposição</option><option value="hidden">Oculto</option></select>
+            </div>
+            <div class="form-field"><label>Ordem</label><input name="position" type="number" min="0" value="0"></div>
+            <div class="form-field form-field--full"><label>Imagem</label><input name="image_file" type="file" accept="image/png,image/jpeg,image/webp"></div>
+        </div>
+        <div class="checkbox-row">
+            <label class="checkbox-field"><input name="active" type="checkbox"> Publicado</label>
+            <label class="checkbox-field"><input name="featured" type="checkbox"> Destaque na home</label>
+        </div>
+        <div class="admin-form-actions"><button class="button button--secondary" type="button" data-close-modal>Cancelar</button><button class="button button--primary" type="submit">Salvar produto</button></div>
+    </form>
+</dialog>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="admin-toast" role="status" data-admin-toast hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/admin-core.js"></script>
+    <script src="../js/admin-produtos.js"></script>
+</body>
+</html>

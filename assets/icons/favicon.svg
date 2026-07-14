@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="faviconTitle">
+  <title id="faviconTitle">Barbearia du Amigo</title>
+  <rect width="64" height="64" rx="16" fill="#C6FF3D"/>
+  <text x="32" y="40" fill="#0B0B0D" font-family="Arial Black, Arial, sans-serif" font-size="25" font-weight="900" text-anchor="middle" letter-spacing="-3">DA</text>
+  <path d="M10 50 54 14" stroke="#F4F4F5" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,111 @@
+.hero {
+    position: relative;
+    display: grid;
+    min-height: min(920px, 100svh);
+    align-items: end;
+    overflow: hidden;
+    padding-block: calc(var(--header-height) + clamp(4rem, 10vw, 8rem)) clamp(4rem, 9vw, 7rem);
+    border-bottom: 1px solid var(--color-border);
+    isolation: isolate;
+}
+
+.hero::before {
+    position: absolute;
+    z-index: -2;
+    width: min(58vw, 720px);
+    aspect-ratio: 0.82;
+    border-radius: 46% 46% 20% 20%;
+    background:
+        linear-gradient(180deg, transparent 20%, rgba(11, 11, 13, 0.9)),
+        repeating-linear-gradient(45deg, #c6ff3d 0 9px, #0b0b0d 9px 18px);
+    content: "";
+    opacity: 0.78;
+    right: -4vw;
+    bottom: -13%;
+    transform: rotate(5deg);
+}
+
+.hero::after {
+    position: absolute;
+    z-index: -1;
+    width: min(48vw, 610px);
+    aspect-ratio: 1;
+    border: 1px solid rgba(198, 255, 61, 0.25);
+    border-radius: 50%;
+    content: "";
+    right: 3vw;
+    bottom: -18%;
+    box-shadow:
+        0 0 0 4rem rgba(198, 255, 61, 0.025),
+        0 0 0 9rem rgba(198, 255, 61, 0.02);
+}
+
+.hero__content {
+    display: grid;
+    gap: 1.35rem;
+}
+
+.hero h1 {
+    max-width: 10.5ch;
+}
+
+.hero__description {
+    max-width: 50ch;
+    font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+.hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+}
+
+.about-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+    gap: clamp(2.25rem, 8vw, 7rem);
+    align-items: center;
+}
+
+.about-layout__media {
+    position: relative;
+}
+
+.about-layout__media::before {
+    position: absolute;
+    z-index: -1;
+    width: 44%;
+    height: 44%;
+    border-radius: 50%;
+    background: var(--color-brand);
+    content: "";
+    filter: blur(70px);
+    opacity: 0.12;
+    left: -8%;
+    bottom: -4%;
+}
+
+.about-layout__content {
+    display: grid;
+    gap: 1.35rem;
+}
+
+.about-layout__content p:not(.eyebrow) {
+    max-width: 50ch;
+}
+
+.products-grid:empty {
+    display: grid;
+    min-height: 230px;
+    place-items: center;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.products-grid:empty::before {
+    color: var(--color-text-faint);
+    content: "Os produtos aparecerão aqui";
+    font-size: var(--text-sm);
+}

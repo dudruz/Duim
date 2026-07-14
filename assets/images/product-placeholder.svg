@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+<rect width="600" height="600" rx="72" fill="#151518"/>
+<circle cx="300" cy="285" r="190" fill="#C6FF3D" opacity=".06"/>
+<path d="M200 201h200l-19 241H219l-19-241Z" fill="#232328" stroke="#C6FF3D" stroke-width="8"/>
+<rect x="184" y="157" width="232" height="61" rx="21" fill="#C6FF3D"/>
+<rect x="244" y="267" width="112" height="91" rx="16" fill="#0B0B0D" stroke="#C6FF3D" stroke-width="6"/>
+<text x="300" y="323" text-anchor="middle" fill="#F4F4F5" font-family="Arial, sans-serif" font-size="26" font-weight="700">DUIM</text>
+</svg>

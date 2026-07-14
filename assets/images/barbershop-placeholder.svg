@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760">
+<rect width="1000" height="760" rx="64" fill="#151518"/>
+<path d="M0 570 1000 420v340H0Z" fill="#0f0f12"/>
+<rect x="104" y="92" width="364" height="402" rx="28" fill="#0b0b0d" stroke="#303038" stroke-width="8"/>
+<rect x="133" y="121" width="306" height="344" rx="20" fill="#1f2024"/>
+<circle cx="286" cy="257" r="88" fill="#C6FF3D" opacity=".12"/>
+<path d="M176 424c24-96 72-140 110-140s86 44 110 140" fill="#2a2a30"/>
+<path d="M663 205v289M587 494h152M615 494l-35 137M711 494l35 137" stroke="#C6FF3D" stroke-width="20" stroke-linecap="round"/>
+<rect x="572" y="248" width="182" height="238" rx="48" fill="#25252b" stroke="#C6FF3D" stroke-width="8"/>
+<rect x="606" y="326" width="114" height="91" rx="22" fill="#111114"/>
+<path d="M525 650h296" stroke="#35353d" stroke-width="10" stroke-linecap="round"/>
+<path d="M807 68c44 0 80 36 80 80v206" fill="none" stroke="#C6FF3D" stroke-width="10"/>
+<circle cx="887" cy="354" r="20" fill="#C6FF3D"/>
+<text x="686" y="112" text-anchor="middle" fill="#F4F4F5" font-family="Arial Black, Arial, sans-serif" font-size="52">DUIM</text>
+</svg>

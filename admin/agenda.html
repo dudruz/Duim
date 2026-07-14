@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Agenda | Painel Duin</title>
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-admin-page="agenda">
+    <div class="admin-shell" data-admin-shell>
+        <aside class="admin-sidebar">
+            <a class="admin-sidebar__brand" href="dashboard.html">
+                <img src="../assets/images/logo-oficial.png" alt="">
+                <span><strong>Barbearia du Amigo</strong><span>Painel do Duin</span></span>
+            </a>
+
+            <nav class="admin-navigation" aria-label="Navegação do painel">
+                <span class="admin-navigation__label">Visão geral</span>
+                <a href="dashboard.html" data-admin-nav="dashboard"><img src="../assets/icons/grid.svg" alt="">Dashboard</a>
+                <a href="agenda.html" data-admin-nav="agenda"><img src="../assets/icons/calendar.svg" alt="">Agenda</a>
+                <a href="clientes.html" data-admin-nav="clientes"><img src="../assets/icons/user.svg" alt="">Clientes</a>
+
+                <span class="admin-navigation__label">Operação</span>
+                <a href="servicos.html" data-admin-nav="servicos"><img src="../assets/icons/scissors.svg" alt="">Serviços</a>
+                <a href="produtos.html" data-admin-nav="produtos"><img src="../assets/icons/package.svg" alt="">Produtos</a>
+                <a href="financeiro.html" data-admin-nav="financeiro"><img src="../assets/icons/wallet.svg" alt="">Financeiro</a>
+                <a href="planos.html" data-admin-nav="planos"><img src="../assets/icons/star.svg" alt="">Planos</a>
+
+                <span class="admin-navigation__label">Sistema</span>
+                <a href="horarios.html" data-admin-nav="horarios"><img src="../assets/icons/clock.svg" alt="">Horários e folgas</a>
+                <a href="configuracoes.html" data-admin-nav="configuracoes"><img src="../assets/icons/edit.svg" alt="">Configurações</a>
+                <a href="../index.html" target="_blank"><img src="../assets/icons/home.svg" alt="">Abrir site</a>
+            </nav>
+
+            <div class="admin-sidebar__footer">
+                <div class="admin-user">
+                    <span class="admin-user__avatar">D</span>
+                    <span><strong data-admin-name>Duin</strong><span data-admin-email></span></span>
+                </div>
+                <button class="admin-logout" type="button" data-admin-logout>Sair do painel</button>
+            </div>
+        </aside>
+
+        <button class="admin-backdrop" type="button" aria-label="Fechar menu" data-admin-backdrop></button>
+
+        <div class="admin-workspace">
+            <header class="admin-topbar">
+                <div style="display:flex;align-items:center;gap:.8rem">
+                    <button class="admin-menu-button" type="button" aria-label="Abrir menu" data-admin-menu>☰</button>
+                    <div>
+                        <h1>Agenda</h1>
+                        <p>Atendimentos, encaixes e status</p>
+                    </div>
+                </div>
+                <div class="admin-topbar__user">
+                    <strong data-admin-name>Duin</strong>
+                </div>
+            </header>
+
+            <main class="admin-main">
+
+<section class="admin-page-heading">
+    <div><h2>Agenda completa</h2><p>Confirme, conclua, cancele e crie encaixes.</p></div>
+    <button class="button button--primary" type="button" data-new-appointment>Novo agendamento</button>
+</section>
+
+<div class="admin-toolbar">
+    <label>Data<input type="date" data-agenda-date></label>
+    <label>Status
+        <select data-agenda-status>
+            <option value="">Todos</option>
+            <option value="pending">Pendente</option>
+            <option value="confirmed">Confirmado</option>
+            <option value="completed">Concluído</option>
+            <option value="cancelled">Cancelado</option>
+            <option value="no_show">Não compareceu</option>
+        </select>
+    </label>
+    <label>Buscar<input type="search" placeholder="Nome, telefone ou serviço" data-agenda-search></label>
+</div>
+
+<section class="agenda-list" data-agenda-list>
+    <div class="admin-empty">Carregando agenda...</div>
+</section>
+
+<dialog class="admin-modal" data-appointment-modal>
+    <div class="admin-modal__header">
+        <div><p class="eyebrow">Encaixe manual</p><h2>Novo agendamento</h2></div>
+        <button class="admin-modal__close" type="button" data-close-modal>×</button>
+    </div>
+    <form class="admin-form" data-appointment-form>
+        <div class="form-grid">
+            <div class="form-field"><label>Nome do cliente</label><input name="customer_name" required></div>
+            <div class="form-field"><label>WhatsApp</label><input name="customer_phone" type="tel" required></div>
+            <div class="form-field"><label>E-mail</label><input name="customer_email" type="email"></div>
+            <div class="form-field"><label>Serviço</label><select name="service_id" required></select></div>
+            <div class="form-field"><label>Data</label><input name="date" type="date" required></div>
+            <div class="form-field"><label>Horário</label><input name="time" type="time" required></div>
+            <div class="form-field"><label>Status</label>
+                <select name="status"><option value="confirmed">Confirmado</option><option value="pending">Pendente</option></select>
+            </div>
+            <div class="form-field form-field--full"><label>Observação</label><textarea name="notes"></textarea></div>
+        </div>
+        <div class="admin-form-actions">
+            <button class="button button--secondary" type="button" data-close-modal>Cancelar</button>
+            <button class="button button--primary" type="submit">Criar agendamento</button>
+        </div>
+    </form>
+</dialog>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="admin-toast" role="status" data-admin-toast hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/admin-core.js"></script>
+    <script src="../js/admin-agenda.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Planos | Painel Duin</title>
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-admin-page="planos">
+    <div class="admin-shell" data-admin-shell>
+        <aside class="admin-sidebar">
+            <a class="admin-sidebar__brand" href="dashboard.html">
+                <img src="../assets/images/logo-oficial.png" alt="">
+                <span><strong>Barbearia du Amigo</strong><span>Painel do Duin</span></span>
+            </a>
+
+            <nav class="admin-navigation" aria-label="Navegação do painel">
+                <span class="admin-navigation__label">Visão geral</span>
+                <a href="dashboard.html" data-admin-nav="dashboard"><img src="../assets/icons/grid.svg" alt="">Dashboard</a>
+                <a href="agenda.html" data-admin-nav="agenda"><img src="../assets/icons/calendar.svg" alt="">Agenda</a>
+                <a href="clientes.html" data-admin-nav="clientes"><img src="../assets/icons/user.svg" alt="">Clientes</a>
+
+                <span class="admin-navigation__label">Operação</span>
+                <a href="servicos.html" data-admin-nav="servicos"><img src="../assets/icons/scissors.svg" alt="">Serviços</a>
+                <a href="produtos.html" data-admin-nav="produtos"><img src="../assets/icons/package.svg" alt="">Produtos</a>
+                <a href="financeiro.html" data-admin-nav="financeiro"><img src="../assets/icons/wallet.svg" alt="">Financeiro</a>
+                <a href="planos.html" data-admin-nav="planos"><img src="../assets/icons/star.svg" alt="">Planos</a>
+
+                <span class="admin-navigation__label">Sistema</span>
+                <a href="horarios.html" data-admin-nav="horarios"><img src="../assets/icons/clock.svg" alt="">Horários e folgas</a>
+                <a href="configuracoes.html" data-admin-nav="configuracoes"><img src="../assets/icons/edit.svg" alt="">Configurações</a>
+                <a href="../index.html" target="_blank"><img src="../assets/icons/home.svg" alt="">Abrir site</a>
+            </nav>
+
+            <div class="admin-sidebar__footer">
+                <div class="admin-user">
+                    <span class="admin-user__avatar">D</span>
+                    <span><strong data-admin-name>Duin</strong><span data-admin-email></span></span>
+                </div>
+                <button class="admin-logout" type="button" data-admin-logout>Sair do painel</button>
+            </div>
+        </aside>
+
+        <button class="admin-backdrop" type="button" aria-label="Fechar menu" data-admin-backdrop></button>
+
+        <div class="admin-workspace">
+            <header class="admin-topbar">
+                <div style="display:flex;align-items:center;gap:.8rem">
+                    <button class="admin-menu-button" type="button" aria-label="Abrir menu" data-admin-menu>☰</button>
+                    <div>
+                        <h1>Planos</h1>
+                        <p>Mensalistas e pacotes recorrentes</p>
+                    </div>
+                </div>
+                <div class="admin-topbar__user">
+                    <strong data-admin-name>Duin</strong>
+                </div>
+            </header>
+
+            <main class="admin-main">
+
+<section class="admin-page-heading">
+    <div><h2>Planos e mensalistas</h2><p>Pacotes recorrentes e quantidade de usos.</p></div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="button button--secondary" type="button" data-new-plan>Novo plano</button>
+        <button class="button button--primary" type="button" data-new-subscription>Novo mensalista</button>
+    </div>
+</section>
+
+<section class="admin-panel" style="margin-bottom:1rem">
+    <div class="admin-panel__header"><h2>Planos</h2></div>
+    <div class="management-grid" data-plans-grid></div>
+</section>
+
+<section class="admin-panel">
+    <div class="admin-panel__header"><h2>Mensalistas</h2></div>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Cliente</th><th>Plano</th><th>Início</th><th>Fim</th><th>Usos restantes</th><th>Status</th></tr></thead>
+            <tbody data-subscriptions-body></tbody>
+        </table>
+    </div>
+</section>
+
+<dialog class="admin-modal" data-plan-modal>
+    <div class="admin-modal__header"><h2>Plano</h2><button class="admin-modal__close" type="button" data-close-modal>×</button></div>
+    <form class="admin-form" data-plan-form>
+        <input name="id" type="hidden">
+        <div class="form-grid">
+            <div class="form-field"><label>Nome</label><input name="name" required></div>
+            <div class="form-field"><label>Preço</label><input name="price" type="number" min="0" step="0.01" required></div>
+            <div class="form-field"><label>Ciclo</label><select name="billing_cycle"><option value="monthly">Mensal</option><option value="weekly">Semanal</option><option value="custom">Personalizado</option></select></div>
+            <div class="form-field"><label>Usos incluídos</label><input name="cuts_included" type="number" min="0" required></div>
+            <div class="form-field form-field--full"><label>Descrição</label><textarea name="description"></textarea></div>
+        </div>
+        <label class="checkbox-field"><input name="active" type="checkbox"> Plano ativo</label>
+        <div class="admin-form-actions"><button class="button button--secondary" type="button" data-close-modal>Cancelar</button><button class="button button--primary" type="submit">Salvar plano</button></div>
+    </form>
+</dialog>
+
+<dialog class="admin-modal" data-subscription-modal>
+    <div class="admin-modal__header"><h2>Novo mensalista</h2><button class="admin-modal__close" type="button" data-close-modal>×</button></div>
+    <form class="admin-form" data-subscription-form>
+        <div class="form-grid">
+            <div class="form-field"><label>Cliente</label><select name="customer_id" required></select></div>
+            <div class="form-field"><label>Plano</label><select name="plan_id" required></select></div>
+            <div class="form-field"><label>Início</label><input name="starts_on" type="date" required></div>
+            <div class="form-field"><label>Fim</label><input name="ends_on" type="date"></div>
+            <div class="form-field"><label>Usos restantes</label><input name="remaining_uses" type="number" min="0" required></div>
+            <div class="form-field"><label>Status</label><select name="status"><option value="active">Ativo</option><option value="paused">Pausado</option><option value="cancelled">Cancelado</option></select></div>
+        </div>
+        <div class="admin-form-actions"><button class="button button--secondary" type="button" data-close-modal>Cancelar</button><button class="button button--primary" type="submit">Salvar mensalista</button></div>
+    </form>
+</dialog>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="admin-toast" role="status" data-admin-toast hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/admin-core.js"></script>
+    <script src="../js/admin-planos.js"></script>
+</body>
+</html>
