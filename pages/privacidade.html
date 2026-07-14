@@ -17,9 +17,10 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
+    <link rel="stylesheet" href="../css/customer.css">
     <link rel="stylesheet" href="../css/responsive.css">
 </head>
-<body>
+<body class="has-mobile-dock">
     <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo</a>
 
     <header class="site-header" data-header>
@@ -38,6 +39,7 @@
                 <a href="../index.html#servicos">Serviços</a>
                 <a href="loja.html">Loja</a>
                 <a href="../index.html#contato">Contato</a>
+                <a href="login.html" data-customer-entry>Entrar</a>
                 <a class="button button--small button--primary" href="agendamento.html">Agendar</a>
             </nav>
         </div>
@@ -71,7 +73,7 @@
 
                 <article class="legal-card">
                     <div class="legal-highlight">
-                        <p><strong>Resumo:</strong> os dados informados no agendamento serão usados para organizar o atendimento e entrar em contato com o cliente. O site não realiza cobrança online nesta etapa.</p>
+                        <p><strong>Resumo:</strong> os dados da conta e do agendamento serão usados para identificar o cliente, organizar os atendimentos, exibir seu histórico e entrar em contato quando necessário. O site não realiza cobrança online nesta etapa.</p>
                     </div>
 
                     <section id="responsavel">
@@ -91,6 +93,8 @@
                             <li>número de WhatsApp ou telefone;</li>
                             <li>serviço, data e horário escolhidos;</li>
                             <li>observações enviadas voluntariamente no agendamento;</li>
+                            <li>preferências de corte, apelido e data de nascimento, quando informados;</li>
+                            <li>histórico de atendimentos, cancelamentos e planos;</li>
                             <li>registros técnicos necessários à segurança e ao funcionamento do sistema.</li>
                         </ul>
                     </section>
@@ -125,7 +129,7 @@
                     <section>
                         <p class="eyebrow">06</p>
                         <h2>Cookies e armazenamento local</h2>
-                        <p>A área administrativa utiliza o armazenamento do navegador para manter a sessão autenticada. O fluxo público de agendamento não depende de cookies de publicidade.</p>
+                        <p>As áreas do cliente e administrativa utilizam o armazenamento do navegador para manter a sessão autenticada. O projeto não usa cookies de publicidade.</p>
                     </section>
 
                     <section>
@@ -159,12 +163,20 @@
         </section>
     </main>
 
+    <nav class="mobile-dock" aria-label="Navegação rápida">
+        <a href="../index.html" data-icon="home">Início</a>
+        <a href="agendamento.html" data-icon="calendar">Agendar</a>
+        <a href="loja.html" data-icon="store">Loja</a>
+        <a href="login.html" data-icon="user" data-customer-entry>Conta</a>
+    </nav>
+
     <footer class="site-footer">
         <div class="container site-footer__content">
             <p>© <span data-current-year></span> <span data-business-name>Barbearia du Amigo</span>. Todos os direitos reservados.</p>
             <div class="site-footer__links">
                 <a href="agendamento.html">Agendamento</a>
                 <a href="../index.html#contato">Contato</a>
+                <a href="login.html" data-customer-entry>Entrar</a>
             </div>
         </div>
     </footer>

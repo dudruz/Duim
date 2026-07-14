@@ -71,6 +71,30 @@
         }
     };
 
+
+    const configureCustomerEntry = async () => {
+        const links = [...document.querySelectorAll("[data-customer-entry]")];
+        if (!links.length) return;
+
+        links.forEach((link) => {
+            link.textContent = "Entrar";
+        });
+
+        if (!window.DuAmigoBackend?.isConfigured() || !window.DuAmigoAPI) return;
+
+        try {
+            const session = await window.DuAmigoAPI.auth.getSession();
+            links.forEach((link) => {
+                link.textContent = session ? "Minha conta" : "Entrar";
+                const inPagesDirectory = /\/pages\/[^/]+$/i.test(window.location.pathname);
+                const prefix = inPagesDirectory ? "" : "pages/";
+                link.href = session ? `${prefix}minha-conta.html` : `${prefix}login.html`;
+            });
+        } catch (error) {
+            console.warn("Não foi possível verificar a sessão do cliente.", error);
+        }
+    };
+
     const setMenuState = (isOpen) => {
         if (!menu || !menuToggle) return;
 
@@ -171,6 +195,7 @@
 
     const start = () => {
         loadRemoteBusinessInformation();
+        configureCustomerEntry();
         configureNavigation();
         configureHeader();
         configureSectionObserver();

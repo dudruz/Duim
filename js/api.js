@@ -65,12 +65,9 @@
 
         async createAppointment(payload) {
             const client = getClient();
-            const data = throwIfError(await client.rpc("create_public_appointment", {
+            const data = throwIfError(await client.rpc("create_customer_appointment", {
                 p_service_id: payload.serviceId,
                 p_starts_at: payload.startsAt,
-                p_customer_name: payload.customerName,
-                p_customer_phone: normalizePhone(payload.customerPhone),
-                p_customer_email: payload.customerEmail || null,
                 p_notes: payload.notes || null
             }));
             return Array.isArray(data) ? data[0] : data;
@@ -81,6 +78,32 @@
         async signIn(email, password) {
             const client = getClient();
             return throwIfError(await client.auth.signInWithPassword({ email, password }));
+        },
+
+        async signUp({ email, password, fullName, phone }) {
+            const client = getClient();
+            return throwIfError(await client.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: String(fullName || "").trim(),
+                        phone: normalizePhone(phone)
+                    }
+                }
+            }));
+        },
+
+        async resetPassword(email, redirectTo) {
+            const client = getClient();
+            return throwIfError(await client.auth.resetPasswordForEmail(email, {
+                redirectTo
+            }));
+        },
+
+        async updatePassword(password) {
+            const client = getClient();
+            return throwIfError(await client.auth.updateUser({ password }));
         },
 
         async signOut() {
@@ -119,6 +142,87 @@
             }
 
             return { user, profile };
+        },
+
+        async requireCustomer() {
+            const user = await this.getUser();
+            if (!user) throw new Error("Faça login para continuar.");
+
+            const profile = await this.getProfile(user.id);
+            if (!profile || !profile.active) {
+                throw new Error("Esta conta não está disponível.");
+            }
+
+            return { user, profile };
+        }
+    };
+
+    const customerApi = {
+        async syncProfile(payload) {
+            const client = getClient();
+            const data = throwIfError(await client.rpc("sync_own_customer_profile", {
+                p_full_name: String(payload.fullName || "").trim(),
+                p_phone: normalizePhone(payload.phone),
+                p_nickname: String(payload.nickname || "").trim() || null,
+                p_birth_date: payload.birthDate || null,
+                p_style_preferences: String(payload.stylePreferences || "").trim() || null
+            }));
+            return Array.isArray(data) ? data[0] : data;
+        },
+
+        async getCustomer() {
+            const client = getClient();
+            return throwIfError(await client
+                .from("customers")
+                .select("*")
+                .maybeSingle());
+        },
+
+        async getAppointments() {
+            const client = getClient();
+            return throwIfError(await client
+                .from("appointments")
+                .select(`
+                    *,
+                    services(id, name, duration_minutes, price)
+                `)
+                .order("starts_at", { ascending: false }));
+        },
+
+        async getSubscriptions() {
+            const client = getClient();
+            return throwIfError(await client
+                .from("subscriptions")
+                .select(`
+                    *,
+                    plans(id, name, description, price, billing_cycle, cuts_included)
+                `)
+                .order("created_at", { ascending: false }));
+        },
+
+        async getOverview() {
+            const { user, profile } = await authApi.requireCustomer();
+            const [customer, appointments, subscriptions] = await Promise.all([
+                this.getCustomer(),
+                this.getAppointments(),
+                this.getSubscriptions()
+            ]);
+
+            return {
+                user,
+                profile,
+                customer,
+                appointments: appointments || [],
+                subscriptions: subscriptions || []
+            };
+        },
+
+        async cancelAppointment(id) {
+            const client = getClient();
+            const data = throwIfError(await client.rpc("cancel_own_appointment", {
+                p_appointment_id: id
+            }));
+            return Array.isArray(data) ? data[0] : data;
         }
     };
 
@@ -141,7 +245,7 @@
                     .select(`
                         *,
                         services(id, name, duration_minutes),
-                        customers(id, name, phone, email)
+                        customers(id, name, nickname, phone, email, style_preferences)
                     `)
                     .gte("starts_at", start)
                     .lte("starts_at", end)
@@ -185,7 +289,7 @@
                 .select(`
                     *,
                     services(id, name, duration_minutes, price),
-                    customers(id, name, phone, email, notes)
+                    customers(id, name, nickname, phone, email, birth_date, style_preferences, notes)
                 `)
                 .order("starts_at", { ascending: true });
 
@@ -202,7 +306,7 @@
             return data.filter((appointment) => {
                 const customer = appointment.customers || {};
                 const service = appointment.services || {};
-                return [customer.name, customer.phone, customer.email, service.name]
+                return [customer.name, customer.nickname, customer.phone, customer.email, service.name, customer.style_preferences]
                     .filter(Boolean)
                     .some((value) => String(value).toLowerCase().includes(term));
             });
@@ -217,7 +321,7 @@
                 .select(`
                     *,
                     services(id, name, duration_minutes, price),
-                    customers(id, name, phone, email)
+                    customers(id, name, nickname, phone, email, style_preferences)
                 `)
                 .single());
         },
@@ -279,7 +383,7 @@
                 .order("name", { ascending: true });
 
             if (search) {
-                query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
+                query = query.or(`name.ilike.%${search}%,nickname.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
             }
 
             return throwIfError(await query);
@@ -289,8 +393,11 @@
             const client = getClient();
             const values = {
                 name: payload.name,
+                nickname: payload.nickname || null,
                 phone: normalizePhone(payload.phone),
                 email: payload.email || null,
+                birth_date: payload.birth_date || null,
+                style_preferences: payload.style_preferences || null,
                 notes: payload.notes || null
             };
 
@@ -591,6 +698,7 @@
     window.DuAmigoAPI = Object.freeze({
         public: Object.freeze(publicApi),
         auth: Object.freeze(authApi),
+        customer: Object.freeze(customerApi),
         admin: Object.freeze(adminApi),
         helpers: Object.freeze({ normalizePhone, localDateRange })
     });

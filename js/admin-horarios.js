@@ -22,8 +22,8 @@
             const row = hours.find((item) => Number(item.weekday) === weekday) || {
                 weekday,
                 is_open: false,
-                opens_at: "09:00",
-                closes_at: "18:00",
+                opens_at: "",
+                closes_at: "",
                 break_start: "",
                 break_end: ""
             };
@@ -36,8 +36,8 @@
                     <input type="checkbox" name="open_${weekday}" ${row.is_open ? "checked" : ""}>
                     <span>${label}</span>
                 </label>
-                <label>Abre<input type="time" name="opens_${weekday}" value="${row.opens_at?.slice(0, 5) || "09:00"}"></label>
-                <label>Fecha<input type="time" name="closes_${weekday}" value="${row.closes_at?.slice(0, 5) || "18:00"}"></label>
+                <label>Abre<input type="time" name="opens_${weekday}" value="${row.opens_at?.slice(0, 5) || ""}"></label>
+                <label>Fecha<input type="time" name="closes_${weekday}" value="${row.closes_at?.slice(0, 5) || ""}"></label>
                 <label>Pausa<input type="time" name="break_start_${weekday}" value="${row.break_start?.slice(0, 5) || ""}"></label>
                 <label>Retorno<input type="time" name="break_end_${weekday}" value="${row.break_end?.slice(0, 5) || ""}"></label>
             `;

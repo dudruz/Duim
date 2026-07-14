@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Recuperar senha | Barbearia du Amigo</title>
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages.css">
+    <link rel="stylesheet" href="../css/customer.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="customer-page" data-customer-auth-page="recovery">
+    <header class="site-header" data-header>
+        <div class="container site-header__content">
+            <a class="brand" href="../index.html"><img class="brand__logo" src="../assets/images/logo-oficial.png" alt="" width="48" height="48"><span class="brand__text">Barbearia du Amigo</span></a>
+            <a class="button button--small button--secondary" href="login.html">Voltar ao login</a>
+        </div>
+    </header>
+    <main class="customer-auth-main">
+        <section class="auth-shell" aria-labelledby="recovery-title">
+            <div class="auth-showcase"><div class="auth-showcase__content"><img class="auth-showcase__logo" src="../assets/images/logo-oficial.png" alt="Logo Corte Dú Amigo"><p class="eyebrow">Recuperação</p><h1>Vamos colocar sua conta na régua.</h1><p>Você receberá um link seguro no e-mail cadastrado.</p></div></div>
+            <div class="auth-panel">
+                <div class="auth-card">
+                    <div class="auth-card__heading"><p class="eyebrow">Esqueci a senha</p><h2 id="recovery-title">Recuperar acesso</h2><p>Informe o e-mail usado no cadastro.</p></div>
+                    <p class="auth-status" data-auth-status hidden role="status"></p>
+                    <form class="auth-form" data-recovery-form novalidate>
+                        <div class="form-field"><label for="recovery-email">E-mail</label><input id="recovery-email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="voce@exemplo.com"><small class="form-error" data-error-for="email"></small></div>
+                        <button class="button button--primary" type="submit">Enviar link de recuperação</button>
+                    </form>
+                    <div class="auth-links"><a class="button button--secondary" href="login.html">Voltar ao login</a></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../js/config.js"></script><script src="../js/utils.js"></script><script src="../js/env.js"></script><script src="../js/supabase-client.js"></script><script src="../js/api.js"></script><script src="../js/main.js"></script><script src="../js/customer-auth.js"></script>
+</body>
+</html>

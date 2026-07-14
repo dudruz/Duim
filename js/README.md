@@ -1,35 +1,23 @@
 # JavaScript
 
-Esta pasta contém toda a aplicação em JavaScript puro.
+## Público
 
-## Base
+- `main.js`: menu, informações da barbearia e estado do link da conta.
+- `home.js`: serviços e produtos da home.
+- `loja.js`: catálogo.
+- `agendamento.js`: agenda autenticada.
 
-- `config.js`: identidade e rotas públicas.
-- `env.js`: URL e anon key do Supabase.
-- `env.example.js`: modelo de configuração.
-- `supabase-client.js`: inicialização única do cliente.
-- `api.js`: consultas, autenticação, CRUD e upload.
-- `utils.js`: formatação e utilitários.
-- `main.js`: navegação e informações públicas.
+## Cliente
 
-## Site público
-
-- `home.js`
-- `agendamento.js`
-- `loja.js`
+- `customer-auth.js`: cadastro, login e recuperação de senha.
+- `customer-account.js`: histórico, próximo atendimento, perfil, plano e cancelamento.
 
 ## Painel
 
-- `admin-core.js`: autenticação, menu, modais e mensagens.
-- `admin-login.js`
-- `admin-dashboard.js`
-- `admin-agenda.js`
-- `admin-clientes.js`
-- `admin-servicos.js`
-- `admin-produtos.js`
-- `admin-financeiro.js`
-- `admin-planos.js`
-- `admin-horarios.js`
-- `admin-configuracoes.js`
+Os arquivos `admin-*.js` controlam cada módulo do painel do Duin.
 
-Nunca coloque a `service_role` no navegador. O front usa apenas a anon key e depende das políticas RLS.
+## Backend
+
+- `env.js`: URL e anon key do Supabase.
+- `supabase-client.js`: cliente único do Supabase.
+- `api.js`: camada de acesso público, cliente e administrador.

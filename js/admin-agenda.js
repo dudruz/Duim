@@ -26,6 +26,13 @@
         }
 
         appointments.forEach((appointment) => {
+            const customer = appointment.customers || {};
+            const displayName = customer.nickname || customer.name || "Cliente";
+            const legalName = customer.nickname && customer.name && customer.nickname !== customer.name
+                ? ` · ${customer.name}`
+                : "";
+            const phone = customer.phone || "";
+            const preference = customer.style_preferences || "";
             const card = document.createElement("article");
             card.className = "agenda-card";
             card.innerHTML = `
@@ -36,12 +43,13 @@
                 <div class="agenda-card__main">
                     <div class="agenda-card__heading">
                         <div>
-                            <strong>${esc(appointment.customers?.name || "Cliente")}</strong>
-                            <span>${esc(appointment.services?.name || "Serviço")} · ${esc(appointment.customers?.phone || "Sem telefone")}</span>
+                            <strong>${esc(displayName)}${esc(legalName)}</strong>
+                            <span>${esc(appointment.services?.name || "Serviço")} · ${esc(phone || "Sem telefone")}</span>
                         </div>
                         <span class="status-badge status-badge--${appointment.status}">${admin.statusLabel(appointment.status)}</span>
                     </div>
-                    ${appointment.notes ? `<p>${esc(appointment.notes)}</p>` : ""}
+                    ${preference ? `<p class="agenda-card__preference"><strong>Preferência:</strong> ${esc(preference)}</p>` : ""}
+                    ${appointment.notes ? `<p><strong>Observação:</strong> ${esc(appointment.notes)}</p>` : ""}
                     <div class="agenda-card__actions">
                         <select aria-label="Alterar status" data-status-id="${appointment.id}">
                             ${["pending", "confirmed", "completed", "cancelled", "no_show"].map((status) =>
@@ -60,7 +68,7 @@
                             <option value="card" ${appointment.payment_method === "card" ? "selected" : ""}>Cartão</option>
                             <option value="transfer" ${appointment.payment_method === "transfer" ? "selected" : ""}>Transferência</option>
                         </select>
-                        <a class="admin-link" href="https://wa.me/55${appointment.customers?.phone || ""}" target="_blank" rel="noopener">WhatsApp</a>
+                        ${phone ? `<a class="admin-link" href="https://wa.me/55${esc(phone)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
                     </div>
                 </div>
             `;

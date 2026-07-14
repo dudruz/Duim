@@ -28,7 +28,7 @@
 
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><strong>${esc(customer.name)}</strong><span>${esc(customer.email || "Sem e-mail")}</span></td>
+                <td><strong>${esc(customer.nickname || customer.name)}</strong><span>${esc(customer.name)} · ${esc(customer.email || "Sem e-mail")}</span></td>
                 <td>${esc(customer.phone)}</td>
                 <td>${completed.length}</td>
                 <td>${latest ? admin.formatDateTime(latest.starts_at) : "Nunca"}</td>
@@ -42,8 +42,11 @@
                 const customer = customers.find((item) => item.id === button.dataset.editCustomer);
                 form.elements.id.value = customer.id;
                 form.elements.name.value = customer.name || "";
+                form.elements.nickname.value = customer.nickname || "";
                 form.elements.phone.value = customer.phone || "";
+                form.elements.birth_date.value = customer.birth_date || "";
                 form.elements.email.value = customer.email || "";
+                form.elements.style_preferences.value = customer.style_preferences || "";
                 form.elements.notes.value = customer.notes || "";
                 admin.openModal(modal);
             });

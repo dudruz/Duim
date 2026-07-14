@@ -17,9 +17,10 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages.css">
+    <link rel="stylesheet" href="../css/customer.css">
     <link rel="stylesheet" href="../css/responsive.css">
 </head>
-<body>
+<body class="has-mobile-dock">
     <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo</a>
 
     <header class="site-header" data-header>
@@ -38,6 +39,7 @@
                 <a href="../index.html#servicos">Serviços</a>
                 <a href="loja.html" aria-current="page">Loja</a>
                 <a href="../index.html#contato">Contato</a>
+                <a href="login.html" data-customer-entry>Entrar</a>
                 <a class="button button--small button--primary" href="agendamento.html">Agendar</a>
             </nav>
         </div>
@@ -127,12 +129,20 @@
         </section>
     </main>
 
+    <nav class="mobile-dock" aria-label="Navegação rápida">
+        <a href="../index.html" data-icon="home">Início</a>
+        <a href="agendamento.html" data-icon="calendar">Agendar</a>
+        <a href="loja.html" data-icon="store" aria-current="page">Loja</a>
+        <a href="login.html" data-icon="user" data-customer-entry>Conta</a>
+    </nav>
+
     <footer class="site-footer">
         <div class="container site-footer__content">
             <p>© <span data-current-year></span> <span data-business-name>Barbearia du Amigo</span>. Todos os direitos reservados.</p>
             <div class="site-footer__links">
                 <a href="privacidade.html">Privacidade</a>
                 <a href="../index.html#contato">Contato</a>
+                <a href="login.html" data-customer-entry>Entrar</a>
             </div>
         </div>
     </footer>

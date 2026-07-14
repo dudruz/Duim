@@ -18,6 +18,11 @@ window.DuAmigoConfig = Object.freeze({
         booking: "pages/agendamento.html",
         store: "pages/loja.html",
         privacy: "pages/privacidade.html",
+        customerLogin: "pages/login.html",
+        customerRegister: "pages/cadastro.html",
+        customerRecovery: "pages/recuperar-senha.html",
+        customerReset: "pages/redefinir-senha.html",
+        customerAccount: "pages/minha-conta.html",
         adminLogin: "admin/login.html",
         adminDashboard: "admin/dashboard.html"
     }),
@@ -25,7 +30,8 @@ window.DuAmigoConfig = Object.freeze({
     features: Object.freeze({
         onlinePayments: false,
         onlineStore: false,
-        customerArea: false
+        customerArea: true,
+        bookingRequiresLogin: true
     }),
 
     backend: Object.freeze({
