@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0d">
+    <meta name="description" content="Catálogo de produtos para cabelo e barba da Barbearia du Amigo, em Minaslândia, Belo Horizonte.">
+    <title>Loja | Barbearia du Amigo</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+    <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo</a>
+
+    <header class="site-header" data-header>
+        <div class="container site-header__content">
+            <a class="brand" href="../index.html" aria-label="Página inicial da Barbearia du Amigo">
+                <img class="brand__logo" src="../assets/images/logo-oficial.png" alt="" width="48" height="48">
+                <span class="brand__text" data-business-name>Barbearia du Amigo</span>
+            </a>
+
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded="false" data-menu-toggle>
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="main-nav" id="menu-principal" aria-label="Navegação principal" data-menu>
+                <a href="../index.html">Início</a>
+                <a href="../index.html#servicos">Serviços</a>
+                <a href="loja.html" aria-current="page">Loja</a>
+                <a href="../index.html#contato">Contato</a>
+                <a class="button button--small button--primary" href="agendamento.html">Agendar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="internal-page" id="conteudo-principal">
+        <section class="internal-hero store-hero" aria-labelledby="store-page-title">
+            <div class="container internal-hero__content">
+                <a class="back-link" href="../index.html">Voltar para o início</a>
+                <span class="status-pill">Catálogo sem checkout</span>
+                <p class="eyebrow">Produtos selecionados</p>
+                <h1 id="store-page-title">Seu estilo continua em casa.</h1>
+                <p class="internal-hero__description">
+                    Consulte os produtos publicados pela barbearia. A retirada e o pagamento são combinados diretamente com o Duin.
+                </p>
+            </div>
+        </section>
+
+        <section class="catalog-section" aria-labelledby="catalog-title">
+            <div class="container">
+                <div class="catalog-heading">
+                    <div>
+                        <p class="eyebrow">Catálogo</p>
+                        <h2 id="catalog-title">Encontre seu produto</h2>
+                        <p>O catálogo é atualizado pelo painel da barbearia.</p>
+                    </div>
+                    <div class="catalog-count" aria-live="polite">
+                        <strong data-product-count>0</strong>
+                        <span data-product-count-label>produtos encontrados</span>
+                    </div>
+                </div>
+
+                <div class="catalog-controls">
+                    <label class="catalog-search" for="product-search">
+                        <img src="../assets/icons/search.svg" alt="" width="20" height="20">
+                        <span class="sr-only">Buscar no catálogo</span>
+                        <input id="product-search" type="search" placeholder="Buscar pomada, balm, shampoo..." autocomplete="off" data-product-search>
+                        <button type="button" aria-label="Limpar busca" title="Limpar busca" data-clear-search hidden>×</button>
+                    </label>
+
+                    <div class="catalog-filters" role="group" aria-label="Filtrar produtos por categoria" data-product-filters></div>
+                </div>
+
+                <div class="catalog-grid" data-catalog-list aria-live="polite"></div>
+
+                <div class="catalog-empty" data-catalog-empty hidden>
+                    <img src="../assets/images/empty-state.svg" alt="" width="190" height="150">
+                    <h3>Nenhum produto por aqui.</h3>
+                    <p>Tente outra busca ou escolha a categoria “Todos”.</p>
+                    <button class="button button--secondary" type="button" data-reset-catalog>Limpar filtros</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="purchase-guide section--contrast" aria-labelledby="purchase-guide-title">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="eyebrow">Como funciona</p>
+                    <h2 id="purchase-guide-title">Simples, sem carrinho complicado.</h2>
+                </div>
+
+                <ol class="purchase-steps">
+                    <li>
+                        <span>01</span>
+                        <div><strong>Escolha o produto</strong><p>Veja os detalhes e confirme se o item está disponível.</p></div>
+                    </li>
+                    <li>
+                        <span>02</span>
+                        <div><strong>Fale com a barbearia</strong><p>Envie uma mensagem para consultar e reservar o item.</p></div>
+                    </li>
+                    <li>
+                        <span>03</span>
+                        <div><strong>Retire no local</strong><p>Combine a retirada e faça o pagamento presencialmente.</p></div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section section--cta" aria-labelledby="store-cta-title">
+            <div class="container cta-card">
+                <div>
+                    <p class="eyebrow">Aproveite a visita</p>
+                    <h2 id="store-cta-title">Produto escolhido e corte marcado.</h2>
+                </div>
+                <a class="button button--primary" href="agendamento.html">Agendar com Duin</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container site-footer__content">
+            <p>© <span data-current-year></span> <span data-business-name>Barbearia du Amigo</span>. Todos os direitos reservados.</p>
+            <div class="site-footer__links">
+                <a href="privacidade.html">Privacidade</a>
+                <a href="../index.html#contato">Contato</a>
+            </div>
+        </div>
+    </footer>
+
+    <dialog class="product-dialog" data-product-dialog aria-labelledby="product-dialog-title">
+        <div class="product-dialog__shell">
+            <button class="product-dialog__close" type="button" aria-label="Fechar detalhes do produto" data-close-product>×</button>
+            <div class="product-dialog__media">
+                <img src="../assets/images/product-placeholder.svg" alt="" width="800" height="600" data-dialog-image>
+            </div>
+            <div class="product-dialog__content">
+                <div class="product-dialog__tags">
+                    <span class="catalog-tag" data-dialog-category></span>
+                    <span class="catalog-tag catalog-tag--brand" data-dialog-badge></span>
+                </div>
+                <p class="eyebrow">Detalhes do produto</p>
+                <h2 id="product-dialog-title" data-dialog-title>Produto</h2>
+                <p data-dialog-description></p>
+                <p class="product-dialog__details" data-dialog-details></p>
+                <div class="product-dialog__purchase">
+                    <div>
+                        <span>Valor</span>
+                        <strong data-dialog-price>—</strong>
+                    </div>
+                    <span class="availability-badge" data-dialog-availability></span>
+                </div>
+                <div class="product-dialog__actions">
+                    <button class="button button--primary" type="button" data-dialog-whatsapp>Consultar pelo WhatsApp</button>
+                    <button class="button button--secondary" type="button" data-close-product>Continuar vendo</button>
+                </div>
+                <p class="product-dialog__notice">A retirada e o pagamento são feitos presencialmente na barbearia.</p>
+            </div>
+        </div>
+    </dialog>
+
+    <div class="site-toast" role="status" aria-live="polite" aria-atomic="true" data-site-toast hidden></div>
+
+    <noscript>
+        <p class="noscript-message">Ative o JavaScript para pesquisar, filtrar e visualizar os produtos.</p>
+    </noscript>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/loja.js"></script>
+</body>
+</html>

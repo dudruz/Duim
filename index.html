@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0f0d">
+    <meta name="description" content="Barbearia du Amigo, com atendimento do barbeiro Duin em Minaslândia, Belo Horizonte. Agende seu horário e conheça nossos serviços.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:title" content="Barbearia du Amigo">
+    <meta property="og:description" content="Corte na régua, atendimento no seu tempo.">
+    <meta property="og:image" content="assets/images/og-cover.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Barbearia du Amigo — atendimento com Duin em Belo Horizonte">
+
+    <title>Barbearia du Amigo | Duin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="assets/icons/safari-pinned-tab.svg" color="#c6ff3d">
+    <link rel="manifest" href="manifest.webmanifest">
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo</a>
+
+    <header class="site-header" data-header>
+        <div class="container site-header__content">
+            <a class="brand" href="index.html" aria-label="Página inicial da Barbearia du Amigo">
+                <img class="brand__logo" src="assets/images/logo-oficial.png" alt="" width="48" height="48">
+                <span class="brand__text" data-business-name>Barbearia du Amigo</span>
+            </a>
+
+            <button
+                class="menu-toggle"
+                type="button"
+                aria-label="Abrir menu"
+                aria-controls="menu-principal"
+                aria-expanded="false"
+                data-menu-toggle
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="main-nav" id="menu-principal" aria-label="Navegação principal" data-menu>
+                <a href="#inicio">Início</a>
+                <a href="#servicos">Serviços</a>
+                <a href="#sobre">Sobre</a>
+                <a href="pages/loja.html">Loja</a>
+                <a href="#contato">Contato</a>
+                <a class="button button--small button--primary" href="pages/agendamento.html">Agendar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="conteudo-principal">
+        <section class="hero" id="inicio" aria-labelledby="hero-title">
+            <div class="container hero__content">
+                <p class="eyebrow">Seu estilo. Seu horário.</p>
+                <h1 id="hero-title">Corte na régua, atendimento no seu tempo.</h1>
+                <p class="hero__description">
+                    Escolha o serviço, encontre um horário livre e marque seu atendimento com o Duin em poucos passos.
+                </p>
+
+                <div class="hero__actions">
+                    <a class="button button--primary" href="pages/agendamento.html">Agendar horário</a>
+                    <a class="button button--secondary" href="#servicos">Ver serviços</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="servicos" aria-labelledby="services-title">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="eyebrow">Serviços</p>
+                    <h2 id="services-title">Escolha seu próximo cuidado</h2>
+                    <p>Escolha o atendimento ideal e consulte os horários disponíveis.</p>
+                </div>
+
+                <div class="services-grid" data-services-list aria-live="polite">
+                    <article class="service-card service-card--placeholder" aria-label="Carregando serviços">
+                        <div class="service-card__icon" aria-hidden="true"></div>
+                        <div class="service-card__line"></div>
+                        <div class="service-card__line service-card__line--short"></div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--contrast" id="sobre" aria-labelledby="about-title">
+            <div class="container about-layout">
+                <div class="about-layout__media" aria-hidden="true">
+                    <div class="image-placeholder">Foto da Barbearia du Amigo</div>
+                </div>
+
+                <div class="about-layout__content">
+                    <p class="eyebrow">Atendimento com <span data-barber-name>Duin</span></p>
+                    <h2 id="about-title">Uma experiência simples, direta e bem-feita.</h2>
+                    <p>
+                        A Barbearia du Amigo une atendimento próximo, ambiente confortável e praticidade para cuidar do seu visual sem complicação.
+                    </p>
+                    <a class="text-link" href="#contato">Conhecer a localização</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="loja" aria-labelledby="store-title">
+            <div class="container">
+                <div class="section-heading section-heading--inline">
+                    <div>
+                        <p class="eyebrow">Produtos</p>
+                        <h2 id="store-title">Cuide do visual também em casa</h2>
+                    </div>
+                    <a class="text-link" href="pages/loja.html">Ver catálogo completo</a>
+                </div>
+
+                <div class="products-grid" data-products-list aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section class="section section--cta" aria-labelledby="cta-title">
+            <div class="container cta-card">
+                <div>
+                    <p class="eyebrow">Agenda aberta</p>
+                    <h2 id="cta-title">Seu próximo horário está a poucos cliques.</h2>
+                </div>
+                <a class="button button--primary" href="pages/agendamento.html">Agendar agora</a>
+            </div>
+        </section>
+
+        <section class="section" id="contato" aria-labelledby="contact-title">
+            <div class="container contact-layout">
+                <div>
+                    <p class="eyebrow">Contato</p>
+                    <h2 id="contact-title">Encontre a Barbearia du Amigo</h2>
+                    <p>Estamos em Minaslândia, Belo Horizonte. Consulte a agenda online ou fale com a barbearia.</p>
+                    <a class="text-link" href="#" target="_blank" rel="noopener noreferrer" data-business-map>Abrir no mapa</a>
+                </div>
+
+                <address class="contact-card">
+                    <p><strong>Endereço</strong><br><span data-business-address>R. Santa Clara de Assis, nº 20 - Minaslândia, Belo Horizonte - MG, 31810-340</span></p>
+                    <p><strong>WhatsApp</strong><br><span data-business-phone>Ainda não informado</span></p>
+                    <p><strong>Funcionamento</strong><br><span data-business-hours>Consulte a agenda online</span></p>
+                </address>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container site-footer__content">
+            <p>© <span data-current-year></span> <span data-business-name>Barbearia du Amigo</span>. Todos os direitos reservados.</p>
+            <div class="site-footer__links">
+                <a href="pages/privacidade.html">Privacidade</a>
+                <a href="admin/login.html" rel="nofollow">Área restrita</a>
+            </div>
+        </div>
+    </footer>
+
+    <noscript>
+        <p class="noscript-message">Ative o JavaScript para usar o agendamento e os recursos interativos do site.</p>
+    </noscript>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/env.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
