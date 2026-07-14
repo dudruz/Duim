@@ -1,12 +1,8 @@
-# Instalação do projeto
+# Instalação final — GitHub Pages + Supabase
 
-## 1. Abrir localmente
+## 1. Executar o banco
 
-Abra a pasta no VS Code e use o Live Server. Não abra os HTMLs diretamente pelo `file://`, pois autenticação e redirecionamentos funcionam melhor em um servidor local.
-
-## 2. Criar o projeto Supabase
-
-Crie um projeto e execute os arquivos da pasta `supabase/migrations/` na ordem:
+No **SQL Editor** do Supabase, execute os arquivos de `supabase/migrations/` nesta ordem:
 
 1. `001_schema.sql`
 2. `002_rls.sql`
@@ -14,61 +10,86 @@ Crie um projeto e execute os arquivos da pasta `supabase/migrations/` na ordem:
 4. `004_storage.sql`
 5. `005_finance_automation.sql`
 6. `006_customer_portal.sql`
+7. `007_fix_booking_auth.sql`
 
-A migração 006 adiciona cadastro de clientes, área personalizada, histórico, cancelamento e agendamento autenticado.
+A migração 007 libera a função autenticada usada pelo cliente e corrige o erro de permissão ao agendar.
 
-## 3. Configurar autenticação
+## 2. Desativar a confirmação de e-mail
 
-No Supabase, configure em **Authentication > URL Configuration**:
+No painel do Supabase, abra:
 
-- **Site URL:** endereço final do site ou URL do Live Server.
-- **Redirect URLs:** inclua o endereço de `pages/redefinir-senha.html`.
+`Authentication > Providers > Email`
 
-Exemplos locais:
+Desative **Confirm email** e salve. O fluxo final depende disso:
+
+`Criar conta → login automático → Minha conta → escolher serviço, dia e horário`
+
+Cadastros feitos enquanto a confirmação estava ativada podem permanecer pendentes. Para testar corretamente, exclua os usuários de teste antigos em **Authentication > Users** e faça um cadastro novo pelo site.
+
+## 3. Configurar as URLs
+
+Em `Authentication > URL Configuration`:
+
+- **Site URL:** coloque a URL publicada no GitHub Pages.
+- **Redirect URLs:** adicione a URL do site com `/**` e a página `pages/redefinir-senha.html`.
+
+Exemplo:
 
 ```text
-http://127.0.0.1:5500/barbearia-du-amigo/
-http://127.0.0.1:5500/barbearia-du-amigo/pages/redefinir-senha.html
+https://SEU-USUARIO.github.io/SEU-REPOSITORIO/
+https://SEU-USUARIO.github.io/SEU-REPOSITORIO/**
+https://SEU-USUARIO.github.io/SEU-REPOSITORIO/pages/redefinir-senha.html
 ```
 
-Caso a confirmação de e-mail esteja ativada, o cliente precisará confirmar a conta antes do primeiro login.
+A confirmação de cadastro não usa mais e-mail. Essas URLs continuam necessárias para recuperação de senha.
 
-## 4. Criar o administrador
+## 4. Conectar o frontend
 
-Crie o usuário do Duin em **Authentication > Users**. Depois execute uma cópia de `supabase/bootstrap-admin.sql.example` com o UUID correto.
+A URL do projeto já está preenchida em `js/env.js`:
 
-## 5. Conectar o front
+```js
+SUPABASE_URL: "https://zglooskfheyjlcbpgbwh.supabase.co"
+```
 
-Abra `js/env.js` e preencha:
+Preencha somente a chave pública:
 
 ```js
 window.DuAmigoEnv = Object.freeze({
-    SUPABASE_URL: "https://SEU-PROJETO.supabase.co",
-    SUPABASE_ANON_KEY: "SUA_ANON_KEY_PUBLICA",
+    SUPABASE_URL: "https://zglooskfheyjlcbpgbwh.supabase.co",
+    SUPABASE_ANON_KEY: "COLE_A_ANON_KEY_OU_PUBLISHABLE_KEY",
     STORAGE_BUCKET: "product-images"
 });
 ```
 
-## 6. Configurar o negócio
+Nunca coloque a `service_role` no GitHub.
 
-Entre em `admin/login.html` e cadastre:
+## 5. Criar o acesso do Duin
 
-- WhatsApp;
-- horários de funcionamento;
-- serviços e valores;
-- produtos;
-- regras da agenda;
-- planos, quando forem utilizados.
+1. Crie o usuário do Duin em **Authentication > Users**.
+2. Copie o UUID dele.
+3. Edite uma cópia de `supabase/bootstrap-admin.sql.example`.
+4. Execute o SQL no Supabase.
+
+## 6. Publicar no GitHub Pages
+
+No repositório:
+
+`Settings > Pages > Deploy from a branch > main > /root`
+
+O arquivo `.nojekyll` já está incluído. Todos os caminhos do site são relativos e compatíveis com um repositório publicado em subpasta.
 
 ## 7. Testar o fluxo do cliente
 
-1. Abra `pages/cadastro.html`.
-2. Crie uma conta com nome, WhatsApp, e-mail e senha.
-3. Entre em `pages/login.html`.
-4. Atualize preferências em `pages/minha-conta.html`.
-5. Agende em `pages/agendamento.html`.
-6. Confirme se o atendimento aparece na conta e no painel do Duin.
+1. Abra o site em aba anônima.
+2. Toque em **Agendar**.
+3. A página **Minha conta** verificará a sessão e encaminhará para o login.
+4. Toque em **Não tenho conta — criar agora**.
+5. Informe nome, WhatsApp, e-mail e senha.
+6. O sistema cria a conta, entra automaticamente e volta para **Minha conta**.
+7. A conta valida nome e WhatsApp e abre a agenda.
+8. Escolha serviço, dia e horário.
+9. Confira o atendimento em **Minha conta** e no painel do Duin.
 
-## 8. Publicar no GitHub Pages
+## 8. Teste local
 
-O front é estático. Confirme que os caminhos relativos, `js/env.js`, Site URL e Redirect URLs do Supabase apontam para o endereço publicado.
+Use Live Server no VS Code. Não abra os arquivos diretamente por `file://`.

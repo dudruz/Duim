@@ -1851,3 +1851,69 @@
         min-height: 3rem;
     }
 }
+
+
+/* Etapa 09: acesso obrigatório antes do agendamento */
+.booking-login-gate {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    border: 1px solid rgba(198, 255, 61, 0.28);
+    border-radius: var(--radius-xl);
+    background:
+        radial-gradient(circle at top right, rgba(198, 255, 61, 0.13), transparent 38%),
+        var(--color-surface);
+    box-shadow: var(--shadow-card);
+    text-align: center;
+}
+.booking-login-gate__icon {
+    display: grid;
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-background);
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+.booking-login-gate h2 {
+    margin: .35rem 0 .75rem;
+    font-size: clamp(2rem, 9vw, 4rem);
+    line-height: .98;
+}
+.booking-login-gate > p:not(.eyebrow) {
+    max-width: 580px;
+    margin: 0 auto;
+    color: var(--color-text-muted);
+}
+.booking-login-gate__actions {
+    display: grid;
+    gap: .75rem;
+    margin: 1.5rem auto 1rem;
+}
+.booking-login-gate__actions .button {
+    width: 100%;
+    min-height: 3.25rem;
+}
+.booking-login-gate small {
+    display: block;
+    color: var(--color-text-soft);
+}
+@media (min-width: 640px) {
+    .booking-login-gate__actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 520px;
+    }
+}
+
+.booking-login-gate__message {
+    margin: 1rem auto 0 !important;
+    padding: .8rem 1rem;
+    border: 1px solid rgba(255, 103, 103, .35);
+    border-radius: var(--radius-md);
+    background: rgba(255, 103, 103, .08);
+    color: #ffb8b8 !important;
+    font-weight: 700;
+}
