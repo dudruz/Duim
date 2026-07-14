@@ -1,0 +1,728 @@
+/* Área do cliente: autenticação, conta e navegação mobile */
+.customer-page {
+    min-height: 100dvh;
+    padding-top: var(--header-height);
+}
+
+.customer-auth-main {
+    position: relative;
+    display: grid;
+    min-height: calc(100dvh - var(--header-height));
+    place-items: center;
+    overflow: hidden;
+    padding: clamp(1.25rem, 5vw, 3.5rem) var(--gutter);
+    isolation: isolate;
+}
+
+.customer-auth-main::before {
+    position: absolute;
+    z-index: -2;
+    width: min(36rem, 92vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: url("../assets/images/logo-oficial.png") center / cover no-repeat;
+    content: "";
+    filter: grayscale(1);
+    opacity: 0.035;
+    right: -12rem;
+    bottom: -15rem;
+}
+
+.customer-auth-main::after {
+    position: absolute;
+    z-index: -1;
+    width: 22rem;
+    height: 22rem;
+    border-radius: 50%;
+    background: var(--color-brand);
+    content: "";
+    filter: blur(150px);
+    opacity: 0.08;
+    left: -10rem;
+    top: -8rem;
+}
+
+.auth-shell {
+    display: grid;
+    width: min(100%, 980px);
+    grid-template-columns: minmax(0, 0.8fr) minmax(360px, 0.55fr);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: clamp(1.2rem, 3vw, 2rem);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-showcase {
+    position: relative;
+    display: flex;
+    min-height: 610px;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    background:
+        linear-gradient(180deg, rgba(11, 11, 13, 0.08), rgba(11, 11, 13, 0.94)),
+        url("../assets/images/brand-cover.webp") center / cover;
+}
+
+.auth-showcase::after {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 25%, transparent, rgba(11, 11, 13, 0.64));
+    content: "";
+}
+
+.auth-showcase__content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    max-width: 530px;
+    gap: 1rem;
+}
+
+.auth-showcase__logo {
+    width: 88px;
+    height: 88px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+}
+
+.auth-showcase h1 {
+    max-width: 11ch;
+    font-size: clamp(2.8rem, 7vw, 5.6rem);
+}
+
+.auth-panel {
+    display: grid;
+    align-content: center;
+    padding: clamp(1.25rem, 4vw, 2.75rem);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), transparent), var(--color-bg-soft);
+}
+
+.auth-card {
+    display: grid;
+    width: 100%;
+    gap: 1.25rem;
+}
+
+.auth-card__heading {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.auth-card__heading h2 {
+    max-width: none;
+    font-size: clamp(2rem, 6vw, 3.3rem);
+}
+
+.auth-card__heading p {
+    font-size: var(--text-sm);
+}
+
+.auth-form {
+    display: grid;
+    gap: 0.95rem;
+}
+
+.auth-form .form-field input,
+.auth-form .form-field select,
+.auth-form .form-field textarea,
+.account-form .form-field input,
+.account-form .form-field select,
+.account-form .form-field textarea {
+    min-height: 3.35rem;
+    font-size: 1rem;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 4.2rem;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.55rem;
+    min-width: 3.1rem;
+    min-height: 2.35rem;
+    padding-inline: 0.55rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    transform: translateY(-50%);
+}
+
+.password-toggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+}
+
+.auth-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--text-xs);
+}
+
+.auth-links {
+    display: grid;
+    gap: 0.65rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.auth-links p {
+    font-size: var(--text-sm);
+}
+
+.auth-status {
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(198, 255, 61, 0.24);
+    border-radius: var(--radius-md);
+    background: var(--color-brand-soft);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+}
+
+.auth-status[data-type="error"] {
+    border-color: rgba(255, 93, 93, 0.35);
+    background: rgba(255, 93, 93, 0.08);
+    color: #ffb5b5;
+}
+
+.auth-status[data-type="success"] {
+    border-color: rgba(198, 255, 61, 0.35);
+    color: var(--color-brand);
+}
+
+.customer-account-main {
+    padding-block: clamp(1.5rem, 5vw, 4rem) clamp(5.5rem, 8vw, 7rem);
+}
+
+.account-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.25rem;
+    align-items: end;
+    margin-bottom: clamp(1.4rem, 4vw, 2.5rem);
+}
+
+.account-hero h1 {
+    max-width: 12ch;
+    font-size: clamp(2.6rem, 8vw, 5.2rem);
+}
+
+.account-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.65rem;
+}
+
+.account-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.account-summary-card,
+.account-panel,
+.next-appointment-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent 52%),
+        var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.account-summary-card {
+    display: grid;
+    min-height: 128px;
+    align-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.account-summary-card span {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.account-summary-card strong {
+    color: var(--color-brand);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 400;
+    line-height: 1;
+}
+
+.account-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(290px, 0.36fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.account-column {
+    display: grid;
+    gap: 1rem;
+}
+
+.account-panel {
+    overflow: hidden;
+}
+
+.account-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.account-panel__header h2 {
+    max-width: none;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+}
+
+.account-panel__body {
+    padding: 1rem;
+}
+
+.next-appointment-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.next-appointment-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.next-appointment-card h3 {
+    max-width: none;
+    font-size: clamp(1.9rem, 6vw, 2.7rem);
+}
+
+.next-appointment-card__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+}
+
+.account-meta {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-soft);
+}
+
+.account-meta span {
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+}
+
+.account-meta strong {
+    font-size: var(--text-sm);
+}
+
+.appointment-tabs {
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    padding: 0.8rem 1rem 0;
+    scrollbar-width: none;
+}
+
+.appointment-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.appointment-tab {
+    flex: 0 0 auto;
+    min-height: 2.55rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 700;
+}
+
+.appointment-tab.is-active {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    color: var(--color-dark-text);
+}
+
+.customer-appointment-list {
+    display: grid;
+    gap: 0.7rem;
+    padding: 1rem;
+}
+
+.customer-appointment {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-soft);
+}
+
+.customer-appointment__date {
+    display: grid;
+    width: 58px;
+    min-height: 62px;
+    place-items: center;
+    align-content: center;
+    border-radius: var(--radius-md);
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    line-height: 1;
+}
+
+.customer-appointment__date strong {
+    color: inherit;
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 400;
+}
+
+.customer-appointment__date span {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.customer-appointment__content {
+    min-width: 0;
+}
+
+.customer-appointment__content h3 {
+    max-width: none;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+.customer-appointment__content p {
+    margin-top: 0.2rem;
+    font-size: var(--text-xs);
+}
+
+.customer-appointment__actions {
+    display: grid;
+    justify-items: end;
+    gap: 0.4rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.55rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-muted);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-badge[data-status="confirmed"],
+.status-badge[data-status="completed"],
+.status-badge[data-status="active"] {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+}
+
+.status-badge[data-status="cancelled"],
+.status-badge[data-status="no_show"] {
+    background: rgba(255, 93, 93, 0.08);
+    color: #ff9f9f;
+}
+
+.link-button {
+    color: var(--color-brand);
+    font-size: var(--text-xs);
+    font-weight: 700;
+}
+
+.link-button.is-danger {
+    color: var(--color-danger);
+}
+
+.account-form {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.account-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.account-form-grid .form-field--full {
+    grid-column: 1 / -1;
+}
+
+.account-plan {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+    border: 1px solid rgba(198, 255, 61, 0.22);
+    border-radius: var(--radius-md);
+    background: var(--color-brand-soft);
+}
+
+.account-plan h3 {
+    max-width: none;
+    font-size: 2rem;
+}
+
+.account-plan__uses {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.account-plan__uses strong {
+    color: var(--color-brand);
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 400;
+}
+
+.account-empty {
+    display: grid;
+    min-height: 150px;
+    place-items: center;
+    gap: 0.6rem;
+    padding: 1.25rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.account-empty strong {
+    display: block;
+}
+
+.mobile-dock {
+    position: fixed;
+    z-index: 85;
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: max(0.75rem, env(safe-area-inset-left));
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+    padding: 0.4rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 1.2rem;
+    background: rgba(19, 19, 22, 0.94);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(20px);
+}
+
+.mobile-dock a {
+    display: grid;
+    min-width: 0;
+    min-height: 3.2rem;
+    place-items: center;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    border-radius: 0.9rem;
+    color: var(--color-text-muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.mobile-dock a::before {
+    font-size: 1.1rem;
+}
+
+.mobile-dock a[data-icon="home"]::before { content: "⌂"; }
+.mobile-dock a[data-icon="calendar"]::before { content: "▣"; }
+.mobile-dock a[data-icon="store"]::before { content: "◇"; }
+.mobile-dock a[data-icon="user"]::before { content: "●"; }
+
+.mobile-dock a[aria-current="page"],
+.mobile-dock a:hover {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+}
+
+@media (max-width: 900px) {
+    .auth-shell {
+        grid-template-columns: 1fr;
+        width: min(100%, 520px);
+    }
+
+    .auth-showcase {
+        min-height: 220px;
+        padding: 1.25rem;
+    }
+
+    .auth-showcase__logo {
+        width: 68px;
+        height: 68px;
+    }
+
+    .auth-showcase h1 {
+        max-width: none;
+        font-size: clamp(2.35rem, 9vw, 3.6rem);
+    }
+
+    .auth-showcase p:not(.eyebrow) {
+        display: none;
+    }
+
+    .account-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .account-column--aside {
+        order: -1;
+    }
+}
+
+@media (max-width: 700px) {
+    body.has-mobile-dock {
+        padding-bottom: 5.5rem;
+    }
+
+    .mobile-dock {
+        display: grid;
+    }
+
+    .account-hero {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .account-hero__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-content: stretch;
+    }
+
+    .account-hero__actions .button {
+        width: 100%;
+    }
+
+    .account-summary-grid {
+        grid-template-columns: repeat(3, minmax(112px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scroll-snap-type: x proximity;
+    }
+
+    .account-summary-card {
+        scroll-snap-align: start;
+    }
+}
+
+@media (max-width: 560px) {
+    .customer-auth-main {
+        align-items: start;
+        padding: 0;
+    }
+
+    .auth-shell {
+        min-height: calc(100dvh - var(--header-height));
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .auth-showcase {
+        min-height: 175px;
+    }
+
+    .auth-showcase__logo {
+        width: 58px;
+        height: 58px;
+    }
+
+    .auth-showcase h1 {
+        font-size: clamp(2.1rem, 11vw, 3rem);
+    }
+
+    .auth-panel {
+        align-content: start;
+        padding: 1.2rem 1rem 2rem;
+    }
+
+    .auth-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+
+    .account-hero__actions {
+        grid-template-columns: 1fr;
+    }
+
+    .next-appointment-card__top {
+        flex-direction: column;
+    }
+
+    .next-appointment-card__meta {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-appointment {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .customer-appointment__actions {
+        grid-column: 1 / -1;
+        width: 100%;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        justify-items: start;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .account-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-form-grid .form-field--full {
+        grid-column: auto;
+    }
+}

@@ -221,3 +221,51 @@
         min-height: 285px;
     }
 }
+
+/* Ajustes finais para navegação mobile */
+@media (max-width: 640px) {
+    .site-header__content {
+        gap: 0.65rem;
+    }
+
+    .site-header__content > .button,
+    .site-header__content > a.button {
+        width: auto;
+        min-height: 2.7rem;
+        flex: 0 0 auto;
+        padding-inline: 0.9rem;
+    }
+
+    .brand {
+        min-width: 0;
+    }
+
+    .brand__logo {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+    }
+
+    .brand__text {
+        overflow: hidden;
+        max-width: 145px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .site-footer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+@media (max-width: 360px) {
+    .brand__text {
+        max-width: 112px;
+    }
+
+    .site-header__content > .button,
+    .site-header__content > a.button {
+        padding-inline: 0.72rem;
+        font-size: 0.75rem;
+    }
+}

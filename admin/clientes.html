@@ -76,7 +76,7 @@
 </div>
 
 <div class="admin-table-wrap">
-    <table class="admin-table">
+    <table class="admin-table customers-table">
         <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Atendimentos</th><th>Última visita</th><th>Ação</th></tr></thead>
         <tbody data-customers-body></tbody>
     </table>
@@ -87,10 +87,13 @@
     <form class="admin-form" data-customer-form>
         <input name="id" type="hidden">
         <div class="form-grid">
-            <div class="form-field"><label>Nome</label><input name="name" required></div>
+            <div class="form-field"><label>Nome completo</label><input name="name" required></div>
+            <div class="form-field"><label>Como prefere ser chamado</label><input name="nickname" maxlength="40"></div>
             <div class="form-field"><label>WhatsApp</label><input name="phone" required></div>
+            <div class="form-field"><label>Data de nascimento</label><input name="birth_date" type="date"></div>
             <div class="form-field form-field--full"><label>E-mail</label><input name="email" type="email"></div>
-            <div class="form-field form-field--full"><label>Observações</label><textarea name="notes"></textarea></div>
+            <div class="form-field form-field--full"><label>Preferências de corte</label><textarea name="style_preferences" placeholder="Ex.: degradê baixo, topo na tesoura..."></textarea></div>
+            <div class="form-field form-field--full"><label>Observações internas</label><textarea name="notes"></textarea></div>
         </div>
         <div class="admin-form-actions"><button class="button button--secondary" type="button" data-close-modal>Cancelar</button><button class="button button--primary" type="submit">Salvar cliente</button></div>
     </form>
