@@ -919,3 +919,11 @@
         height: 2.7rem;
     }
 }
+
+/* Etapa 14: saldo mensal reservado e ajuda do WhatsApp. */
+.account-plan__usage-detail {
+    margin: 0.65rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
