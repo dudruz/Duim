@@ -20,6 +20,24 @@
     let overview = null;
     let currentFilter = "all";
 
+    const startPaymentFlow = ({ kind, targetId, checkoutUrl = "", planName = "", amount = 0 }) => {
+        const paymentUrl = new URL("pagamento.html", window.location.href);
+        paymentUrl.searchParams.set("iniciar", "1");
+        paymentUrl.searchParams.set("tipo", kind);
+        paymentUrl.searchParams.set("id", targetId);
+
+        sessionStorage.setItem("duamigo_payment_context", JSON.stringify({
+            kind,
+            targetId,
+            checkoutUrl,
+            planName,
+            amount: Number(amount || 0),
+            createdAt: new Date().toISOString()
+        }));
+
+        window.location.assign(paymentUrl.href);
+    };
+
     const statusLabels = {
         pending: "Pendente",
         confirmed: "Confirmado",
@@ -312,9 +330,13 @@
                 card.append(top, status);
                 if (request.status === "pending_payment") {
                     if (request.checkout_url) {
-                        const link = document.createElement("a");
+                        const link = document.createElement("button");
+                        link.type = "button";
                         link.className = "button button--small button--primary";
-                        link.href = request.checkout_url;
+                        link.dataset.openSubscriptionPayment = request.id;
+                        link.dataset.checkoutUrl = request.checkout_url;
+                        link.dataset.planName = request.plans?.name || "Mensalidade";
+                        link.dataset.amount = String(request.amount || 0);
                         link.textContent = "Continuar pagamento";
                         card.append(link);
                     } else {
@@ -504,18 +526,28 @@
                 return;
             }
 
+            const openSubscriptionPayment = event.target.closest("[data-open-subscription-payment]");
+            if (openSubscriptionPayment) {
+                startPaymentFlow({
+                    kind: "subscription",
+                    targetId: openSubscriptionPayment.dataset.openSubscriptionPayment,
+                    checkoutUrl: openSubscriptionPayment.dataset.checkoutUrl || "",
+                    planName: openSubscriptionPayment.dataset.planName || "Mensalidade",
+                    amount: openSubscriptionPayment.dataset.amount || 0
+                });
+                return;
+            }
+
             const resumeCheckout = event.target.closest("[data-resume-subscription-checkout]");
             if (resumeCheckout) {
                 const original = resumeCheckout.textContent;
                 resumeCheckout.disabled = true;
                 resumeCheckout.textContent = "Abrindo...";
                 try {
-                    const checkout = await api.public.createCheckout({
+                    startPaymentFlow({
                         kind: "subscription",
-                        subscriptionRequestId: resumeCheckout.dataset.resumeSubscriptionCheckout
+                        targetId: resumeCheckout.dataset.resumeSubscriptionCheckout
                     });
-                    if (!checkout?.url) throw new Error("Não foi possível abrir o checkout.");
-                    window.location.assign(checkout.url);
                 } catch (error) {
                     setStatus(error?.message || "Não foi possível gerar o pagamento.", "error");
                     resumeCheckout.disabled = false;
@@ -534,13 +566,13 @@
             try {
                 const request = await api.customer.requestSubscription(button.dataset.planOnline || button.dataset.planCash, online ? "online" : "cash");
                 if (online) {
-                    if (request?.checkout_url) {
-                        window.location.assign(request.checkout_url);
-                        return;
-                    }
-                    const checkout = await api.public.createCheckout({ kind: "subscription", subscriptionRequestId: request.request_id });
-                    if (!checkout?.url) throw new Error("Não foi possível abrir o checkout.");
-                    window.location.assign(checkout.url);
+                    startPaymentFlow({
+                        kind: "subscription",
+                        targetId: request.request_id,
+                        checkoutUrl: request.checkout_url || "",
+                        planName: request.plan_name || "",
+                        amount: request.amount || 0
+                    });
                     return;
                 }
                 await load();

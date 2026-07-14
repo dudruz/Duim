@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b0b0d">
     <meta name="robots" content="noindex, nofollow">
-    <title>Confirmando pagamento | Barbearia du Amigo</title>
+    <title>Pagamento | Barbearia du Amigo</title>
     <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
     <link rel="stylesheet" href="../css/reset.css">
@@ -20,33 +20,66 @@
 <body class="customer-page has-mobile-dock" data-payment-result>
     <header class="site-header" data-header>
         <div class="container site-header__content">
-            <a class="brand" href="../index.html"><img class="brand__logo" src="../assets/images/logo-oficial.png" alt="" width="48" height="48"><span class="brand__text">Barbearia du Amigo</span></a>
+            <a class="brand" href="../index.html">
+                <img class="brand__logo" src="../assets/images/logo-oficial.png" alt="" width="48" height="48">
+                <span class="brand__text">Barbearia du Amigo</span>
+            </a>
         </div>
     </header>
 
     <main class="payment-result-main">
         <section class="payment-result-card" data-payment-card data-state="loading" aria-live="polite">
             <span class="payment-result-card__icon" data-payment-icon>…</span>
-            <p class="eyebrow">InfinitePay</p>
-            <h1 data-payment-title>Confirmando pagamento.</h1>
-            <p data-payment-message>Estamos conferindo a transação e atualizando sua conta.</p>
-            <div class="payment-result-actions" data-payment-actions hidden>
+            <p class="eyebrow">Pagamento seguro</p>
+            <h1 data-payment-title>Preparando seu pagamento.</h1>
+            <p data-payment-message>Estamos gerando o checkout da InfinitePay.</p>
+
+            <div class="payment-checkout-summary" data-payment-summary hidden>
+                <div>
+                    <span data-payment-summary-label>Pagamento</span>
+                    <strong data-payment-summary-name>Barbearia du Amigo</strong>
+                </div>
+                <strong data-payment-summary-amount></strong>
+            </div>
+
+            <div class="payment-start-actions" data-payment-start-actions hidden>
+                <a class="button button--primary payment-open-button" href="#" data-payment-open rel="noopener">
+                    Abrir pagamento na InfinitePay
+                </a>
+                <p class="payment-start-hint">
+                    O pagamento abre em uma página segura da InfinitePay. Você poderá escolher Pix ou cartão.
+                </p>
+            </div>
+
+            <div class="payment-result-actions" data-payment-success-actions hidden>
                 <a class="button button--primary" href="minha-conta.html">Ver minha conta</a>
                 <a class="button button--secondary" href="agendamento.html">Voltar à agenda</a>
             </div>
-            <button class="button button--secondary" type="button" data-payment-retry hidden>Verificar novamente</button>
+
+            <button class="button button--secondary" type="button" data-payment-retry hidden>
+                Tentar novamente
+            </button>
+
+            <a class="text-link payment-account-link" href="minha-conta.html" data-payment-account-link>
+                Voltar para Minha conta
+            </a>
         </section>
     </main>
 
-    <nav class="mobile-dock" aria-label="Navegação rápida"><a href="../index.html" data-icon="home">Início</a><a href="agendamento.html" data-icon="calendar">Agendar</a><a href="loja.html" data-icon="store">Loja</a><a href="minha-conta.html" data-icon="user">Conta</a></nav>
+    <nav class="mobile-dock" aria-label="Navegação rápida">
+        <a href="../index.html" data-icon="home">Início</a>
+        <a href="agendamento.html" data-icon="calendar">Agendar</a>
+        <a href="loja.html" data-icon="store">Loja</a>
+        <a href="minha-conta.html" data-icon="user">Conta</a>
+    </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js?v=16"></script>
-    <script src="../js/utils.js?v=16"></script>
-    <script src="../js/env.js?v=16"></script>
-    <script src="../js/supabase-client.js?v=16"></script>
-    <script src="../js/api.js?v=16"></script>
-    <script src="../js/main.js?v=16"></script>
-    <script src="../js/pagamento.js?v=16"></script>
+    <script src="../js/config.js?v=17"></script>
+    <script src="../js/utils.js?v=17"></script>
+    <script src="../js/env.js?v=17"></script>
+    <script src="../js/supabase-client.js?v=17"></script>
+    <script src="../js/api.js?v=17"></script>
+    <script src="../js/main.js?v=17"></script>
+    <script src="../js/pagamento.js?v=17"></script>
 </body>
 </html>

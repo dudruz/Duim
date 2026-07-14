@@ -367,15 +367,22 @@
             });
 
             if (result?.requires_checkout) {
-                try {
-                    const checkout = await api.public.createCheckout({ kind: "appointment", appointmentId: result.appointment_id });
-                    if (!checkout?.url) throw new Error("O checkout não retornou um endereço de pagamento.");
-                    window.location.assign(checkout.url);
-                    return;
-                } catch (checkoutError) {
-                    await api.customer.cancelAppointment(result.appointment_id).catch(() => null);
-                    throw checkoutError;
-                }
+                const paymentUrl = new URL("pagamento.html", window.location.href);
+                paymentUrl.searchParams.set("iniciar", "1");
+                paymentUrl.searchParams.set("tipo", "appointment");
+                paymentUrl.searchParams.set("id", result.appointment_id);
+
+                sessionStorage.setItem("duamigo_payment_context", JSON.stringify({
+                    kind: "appointment",
+                    targetId: result.appointment_id,
+                    serviceName: state.service?.name || "Atendimento",
+                    amount: Number(state.service?.price || 0),
+                    startsAt: state.slot?.starts_at || null,
+                    createdAt: new Date().toISOString()
+                }));
+
+                window.location.assign(paymentUrl.href);
+                return;
             }
 
             panels.forEach((panel) => { panel.hidden = true; });
