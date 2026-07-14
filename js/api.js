@@ -254,8 +254,22 @@
         async getOverview() {
             const { user, profile } = await authApi.requireCustomer();
             const client = getClient();
-            const [customer, appointments, subscriptions, plans, subscriptionRequests, settingsResult] = await Promise.all([
-                this.getCustomer(),
+            let customer = await this.getCustomer();
+
+            // Contas antigas podiam possuir profile correto, mas nenhum registro vinculado
+            // em customers. Depois da migração 010, esta chamada repara o vínculo sozinha.
+            if (!customer) {
+                const profileName = String(profile?.full_name || user?.user_metadata?.full_name || "").trim();
+                const profilePhone = normalizePhone(profile?.phone || user?.user_metadata?.phone || "");
+                if (profileName.length >= 3 && utils?.isValidBrazilPhone(profilePhone)) {
+                    customer = await this.syncProfile({
+                        fullName: profileName,
+                        phone: profilePhone
+                    });
+                }
+            }
+
+            const [appointments, subscriptions, plans, subscriptionRequests, settingsResult] = await Promise.all([
                 this.getAppointments(),
                 this.getSubscriptions(),
                 this.getPlans(),

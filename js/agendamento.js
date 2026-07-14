@@ -62,12 +62,25 @@
 
     const formatDate = (date, options) => new Intl.DateTimeFormat("pt-BR", options).format(date);
     const formatPhone = (value = "") => utils.formatBrazilPhone(value, "Não informado");
+    const reservedSubscriptionUses = (subscriptionId) => (state.account?.appointments || []).filter((appointment) => (
+        appointment.subscription_id === subscriptionId
+        && appointment.billing_mode === "subscription"
+        && ["pending", "confirmed"].includes(appointment.status)
+        && appointment.subscription_use_consumed !== true
+    )).length;
+
+    const availableSubscriptionUses = (subscription) => {
+        const planLimit = Number(subscription?.plans?.cuts_included || subscription?.remaining_uses || 0);
+        const remaining = Math.min(Number(subscription?.remaining_uses || 0), planLimit);
+        return Math.max(remaining - reservedSubscriptionUses(subscription?.id), 0);
+    };
+
     const activeSubscription = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return (state.account?.subscriptions || []).find((item) => (
             item.status === "active"
-            && Number(item.remaining_uses || 0) > 0
+            && availableSubscriptionUses(item) > 0
             && (!item.ends_on || new Date(`${item.ends_on}T23:59:59`).getTime() >= today.getTime())
         ));
     };
@@ -116,7 +129,7 @@
                 const plan = activeSubscription();
                 noticeTitle.textContent = "Atendimento mensalista";
                 noticeText.textContent = plan
-                    ? `${plan.plans?.name || "Plano ativo"}: ${plan.remaining_uses} uso(s) disponível(is).`
+                    ? `${plan.plans?.name || "Plano ativo"}: ${availableSubscriptionUses(plan)} uso(s) disponível(is) para agendar.`
                     : "É necessário possuir um plano ativo com uso disponível.";
             } else {
                 noticeTitle.textContent = "A cobrar no salão";
@@ -144,7 +157,7 @@
                 value: "subscription",
                 title: "Usar minha mensalidade",
                 badge: "Mensalista",
-                description: `${plan.plans?.name || "Plano ativo"} · ${plan.remaining_uses} uso(s) disponível(is).`
+                description: `${plan.plans?.name || "Plano ativo"} · ${availableSubscriptionUses(plan)} uso(s) disponível(is) para agendar.`
             });
         }
         options.push({
@@ -377,6 +390,10 @@
                 window.location.replace("minha-conta.html?acao=agendar");
                 return;
             }
+            if (/complete.*dados|nome e whatsapp|whatsapp.*conta/i.test(message)) {
+                window.location.replace("minha-conta.html?acao=agendar&motivo=perfil");
+                return;
+            }
             setStatus(message || "Não foi possível concluir o agendamento. O horário pode ter acabado de ser ocupado.", "error");
         } finally {
             submitButton.disabled = false;
@@ -416,7 +433,7 @@
             const profile = account.profile || {};
             const phone = utils.normalizeBrazilPhone(customer.phone || profile.phone || "");
             if (!account.customer || String(customer.name || profile.full_name || "").trim().length < 3 || !utils.isValidBrazilPhone(phone)) {
-                window.location.replace("minha-conta.html?acao=agendar");
+                window.location.replace("minha-conta.html?acao=agendar&motivo=perfil");
                 return;
             }
             state.billingMode = activeSubscription() ? "subscription" : (state.settings.online_payments_enabled ? "online" : "salon");

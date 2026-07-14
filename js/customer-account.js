@@ -40,7 +40,7 @@
 
     const bindPhoneMask = (input) => {
         input?.addEventListener("input", () => {
-            input.value = formatPhoneDisplay(input.value);
+            input.value = utils.formatBrazilPhoneInput(input.value);
         });
     };
 
@@ -74,6 +74,19 @@
         return new Date(`${item.ends_on}T23:59:59`).getTime() >= Date.now();
     };
 
+    const reservedSubscriptionUses = (subscriptionId) => (overview?.appointments || []).filter((appointment) => (
+        appointment.subscription_id === subscriptionId
+        && appointment.billing_mode === "subscription"
+        && ["pending", "confirmed"].includes(appointment.status)
+        && appointment.subscription_use_consumed !== true
+    )).length;
+
+    const availableSubscriptionUses = (subscription) => {
+        const planLimit = Number(subscription?.plans?.cuts_included || subscription?.remaining_uses || 0);
+        const remaining = Math.min(Number(subscription?.remaining_uses || 0), planLimit);
+        return Math.max(remaining - reservedSubscriptionUses(subscription?.id), 0);
+    };
+
     const getUpcoming = () => (overview?.appointments || [])
         .filter(isUpcoming)
         .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
@@ -86,7 +99,7 @@
 
         document.querySelector("[data-account-completed]").textContent = String(completed);
         document.querySelector("[data-account-next-short]").textContent = next ? dateParts(next.starts_at).short : "—";
-        document.querySelector("[data-account-plan-uses]").textContent = activePlan ? String(activePlan.remaining_uses) : "—";
+        document.querySelector("[data-account-plan-uses]").textContent = activePlan ? String(availableSubscriptionUses(activePlan)) : "—";
     };
 
     const renderNext = () => {
@@ -243,11 +256,18 @@
             const uses = document.createElement("div");
             uses.className = "account-plan__uses";
             const label = document.createElement("span");
-            label.textContent = "Usos restantes";
+            const available = availableSubscriptionUses(activePlan);
+            const reserved = reservedSubscriptionUses(activePlan.id);
+            label.textContent = "Disponíveis para agendar";
             const value = document.createElement("strong");
-            value.textContent = String(activePlan.remaining_uses);
+            value.textContent = String(available);
             uses.append(label, value);
-            card.append(badge, title, description, uses);
+            const usageDetail = document.createElement("p");
+            usageDetail.className = "account-plan__usage-detail";
+            usageDetail.textContent = reserved
+                ? `${reserved} corte(s) já reservado(s) neste ciclo.`
+                : `${activePlan.remaining_uses} corte(s) restantes neste ciclo.`;
+            card.append(badge, title, description, uses, usageDetail);
             planContainer.append(card);
         } else {
             const empty = document.createElement("div");
@@ -544,7 +564,7 @@
             const phone = utils.normalizeBrazilPhone(values.phone);
             const fullName = String(values.fullName || "").trim();
             const nameError = fullName.length >= 3 ? "" : "Informe seu nome completo.";
-            const phoneError = utils.isValidBrazilPhone(phone) ? "" : "Informe um WhatsApp válido com DDD.";
+            const phoneError = utils.isValidBrazilPhone(phone) ? "" : "Digite DDD + número, sem o 55. Ex.: (31) 99999-9999.";
             form.querySelector('[data-error-for="fullName"]').textContent = nameError;
             form.querySelector('[data-error-for="phone"]').textContent = phoneError;
             if (nameError || phoneError) return;
@@ -554,15 +574,23 @@
             button.disabled = true;
             button.textContent = "Salvando...";
             try {
-                await api.customer.syncProfile({
+                const savedCustomer = await api.customer.syncProfile({
                     fullName,
                     phone,
                     nickname: values.nickname,
                     birthDate: values.birthDate,
                     stylePreferences: values.stylePreferences
                 });
+
+                // Usa imediatamente o registro devolvido pelo banco. Isso evita que o
+                // agendamento leia um profile atualizado antes do vínculo customer existir.
+                overview = overview || {};
+                overview.customer = savedCustomer;
+                form.elements.phone.value = formatPhoneDisplay(savedCustomer?.phone || phone);
+
                 if (bookingRequested) {
-                    window.location.replace("agendamento.html");
+                    setStatus("Dados salvos. Abrindo a agenda...", "success");
+                    window.setTimeout(() => window.location.replace("agendamento.html"), 250);
                     return;
                 }
                 await load();

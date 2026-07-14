@@ -1,3 +1,6 @@
+-- V13.1 CORRIGIDA: removido caractere acidental após capture_method text;
+-- Execute este arquivo inteiro no SQL Editor do Supabase.
+
 begin;
 
 -- Etapa 13: formas de cobrança no agendamento, mensalistas e conciliação InfinitePay.

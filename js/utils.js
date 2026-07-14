@@ -23,15 +23,18 @@ window.DuAmigoUtils = (() => {
      * sem +55. Aceita entradas como 31999999999, 5531999999999 e +55 (31) 3333-4444.
      */
     const normalizeBrazilPhone = (value = "") => {
-        let digits = String(value ?? "").replace(/\D/g, "");
+        const raw = String(value ?? "").trim();
+        let digits = raw.replace(/\D/g, "");
 
-        // Prefixo internacional discado como 00 55.
-        if (digits.startsWith("0055") && digits.length >= 14) {
+        // Quando o usuário digitou explicitamente +55 ou 0055, remove o país
+        // antes de aplicar a máscara de DDD + número.
+        if (/^\s*\+\s*55/.test(raw)) {
+            digits = raw.replace(/^\s*\+\s*55/, "").replace(/\D/g, "");
+        } else if (/^\s*00\s*55/.test(raw)) {
+            digits = raw.replace(/^\s*00\s*55/, "").replace(/\D/g, "");
+        } else if (digits.startsWith("0055") && (digits.length === 14 || digits.length === 15)) {
             digits = digits.slice(4);
-        }
-
-        // Remove o código do Brasil somente quando há um telefone completo depois dele.
-        if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) {
+        } else if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) {
             digits = digits.slice(2);
         }
 
@@ -40,10 +43,17 @@ window.DuAmigoUtils = (() => {
             digits = digits.replace(/^0+/, "");
         }
 
-        // Proteção para valores antigos com prefixos extras.
         if (digits.length > 11) digits = digits.slice(-11);
-
         return digits;
+    };
+
+    const formatBrazilPhoneInput = (value = "") => {
+        const raw = String(value ?? "");
+        const explicitCountryCode = /^\s*(?:\+\s*55|00\s*55)/.test(raw);
+        const normalized = explicitCountryCode
+            ? normalizeBrazilPhone(raw)
+            : raw.replace(/\D/g, "").slice(0, 11);
+        return formatBrazilPhone(normalized);
     };
 
     const isValidBrazilPhone = (value = "") => {
@@ -96,6 +106,7 @@ window.DuAmigoUtils = (() => {
         normalizeBrazilPhone,
         isValidBrazilPhone,
         formatBrazilPhone,
+        formatBrazilPhoneInput,
         toWhatsAppDigits,
         createElement,
         debounce

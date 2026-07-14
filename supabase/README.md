@@ -13,8 +13,9 @@ Projeto: `zglooskfheyjlcbpgbwh`
 7. `migrations/007_fix_booking_auth.sql`
 8. `migrations/008_normalize_brazil_phone.sql`
 9. `migrations/009_payments_subscriptions_mobile.sql`
+10. `migrations/010_profile_link_and_subscription_limits.sql`
 
-Em uma instalação já atualizada até a v12, execute apenas a migração `009`.
+Em uma instalação já atualizada até a v13, execute apenas a migração `010`.
 
 ## O que a migração 009 adiciona
 
@@ -42,3 +43,13 @@ Consulte `docs/INFINITEPAY.md` para configuração e deploy.
 - O painel depende de Auth, cargo e RLS.
 - Cada cliente lê somente os próprios registros.
 - Funções financeiras sensíveis são executadas apenas por admin ou service role.
+
+## O que a migração 010 corrige
+
+- Erro `column reference email is ambiguous` ao salvar Minha conta.
+- WhatsApp com ou sem `+55`, salvo como DDD + número.
+- Vínculo automático entre usuário autenticado e cadastro do cliente.
+- Bloqueio da 5ª reserva quando o plano possui quatro cortes no ciclo.
+- Reservas futuras passam a contar no saldo disponível.
+- Novo plano não pode ser contratado enquanto a mensalidade atual estiver vigente.
+- Renovação abre um novo ciclo sem acumular usos antigos.

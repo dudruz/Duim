@@ -11,9 +11,9 @@ GitHub Pages + Supabase + InfinitePay
    Nunca coloque service_role no GitHub.
 
 3. BANCO DE DADOS
-   Execute as migrações 001 até 009, na ordem, no SQL Editor.
-   Em projeto que já possui 001–008, execute somente:
-   supabase/migrations/009_payments_subscriptions_mobile.sql
+   Execute as migrações 001 até 010, na ordem, no SQL Editor.
+   Em projeto que já possui 001–009, execute somente:
+   supabase/migrations/010_profile_link_and_subscription_limits.sql
 
 4. ADMINISTRADOR
    Crie o usuário do Duin em Authentication > Users.

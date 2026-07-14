@@ -59,7 +59,7 @@
 
     const formatPhone = (input) => {
         input?.addEventListener("input", () => {
-            input.value = utils.formatBrazilPhone(input.value);
+            input.value = utils.formatBrazilPhoneInput(input.value);
         });
     };
 
@@ -170,7 +170,7 @@
             };
 
             setError(form, "fullName", valid.fullName ? "" : "Informe seu nome e sobrenome.");
-            setError(form, "phone", valid.phone ? "" : "Informe um WhatsApp válido com DDD.");
+            setError(form, "phone", valid.phone ? "" : "Digite DDD + número, sem o 55. Ex.: (31) 99999-9999.");
             setError(form, "email", valid.email ? "" : "Informe um e-mail válido.");
             setError(form, "password", valid.password ? "" : "Use pelo menos 6 caracteres.");
             if (!Object.values(valid).every(Boolean)) return;
