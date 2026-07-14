@@ -652,3 +652,103 @@
     color: var(--color-text-muted);
     font-size: 0.72rem;
 }
+
+
+/* Etapa 17 — tela intermediária de pagamento */
+.payment-checkout-summary {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-2, rgba(255, 255, 255, 0.035));
+    text-align: left;
+}
+
+.payment-checkout-summary > div {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+}
+
+.payment-checkout-summary span {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.payment-checkout-summary strong {
+    overflow-wrap: anywhere;
+}
+
+.payment-checkout-summary > strong {
+    flex: 0 0 auto;
+    color: var(--color-brand);
+    font-size: 1.05rem;
+}
+
+.payment-start-actions {
+    display: grid;
+    width: 100%;
+    gap: 0.75rem;
+}
+
+.payment-open-button {
+    width: 100%;
+    min-height: 3.5rem;
+    font-size: 1rem;
+}
+
+.payment-start-hint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.payment-account-link {
+    margin-top: 0.15rem;
+}
+
+.payment-result-card[data-state="ready"] .payment-result-card__icon,
+.payment-result-card[data-state="success"] .payment-result-card__icon {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+}
+
+.payment-result-card[data-state="pending"] .payment-result-card__icon {
+    background: rgba(255, 190, 70, 0.14);
+    color: #ffbe46;
+}
+
+@media (max-width: 520px) {
+    .payment-result-main {
+        align-items: start;
+        padding-top: 1rem;
+    }
+
+    .payment-result-card {
+        gap: 0.85rem;
+        padding: 1.15rem;
+        border-radius: 1.15rem;
+    }
+
+    .payment-result-card h1 {
+        font-size: clamp(1.65rem, 9vw, 2.25rem);
+    }
+
+    .payment-checkout-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+
+    .payment-checkout-summary > strong {
+        font-size: 1.2rem;
+    }
+}
