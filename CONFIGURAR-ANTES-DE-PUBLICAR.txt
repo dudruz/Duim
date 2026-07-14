@@ -1,0 +1,16 @@
+BARBEARIA DU AMIGO — CONFIGURAÇÃO ANTES DE PUBLICAR
+
+1. Supabase > Authentication > Providers > Email
+   Desative: Confirm email
+
+2. Exclua usuários de teste criados antes dessa alteração.
+
+3. Preencha js/env.js com a ANON KEY ou PUBLISHABLE KEY.
+   Nunca use a service_role.
+
+4. Execute as migrações 001 até 007 no SQL Editor.
+
+5. Configure a URL do GitHub Pages em Authentication > URL Configuration.
+
+6. Teste em aba anônima:
+   Agendar > Criar conta > Minha conta > escolher horário.

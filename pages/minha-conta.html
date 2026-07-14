@@ -29,7 +29,7 @@
             <nav class="main-nav" id="menu-principal" aria-label="Navegação principal" data-menu>
                 <a href="../index.html">Início</a>
                 <a href="loja.html">Loja</a>
-                <a href="agendamento.html">Agendar</a>
+                <a href="minha-conta.html?acao=agendar">Agendar</a>
                 <button class="button button--small button--secondary" type="button" data-customer-logout>Sair</button>
             </nav>
         </div>
@@ -50,6 +50,16 @@
             </section>
 
             <p class="auth-status" data-account-status hidden role="status"></p>
+
+            <section class="account-booking-gateway" data-account-booking-gateway hidden aria-live="polite">
+                <div class="account-booking-gateway__icon" aria-hidden="true">✓</div>
+                <div class="account-booking-gateway__content">
+                    <p class="eyebrow">Conta verificada</p>
+                    <h2 data-booking-gateway-title>Agora é só escolher seu horário.</h2>
+                    <p data-booking-gateway-text>Carregando seus dados antes de abrir a agenda...</p>
+                </div>
+                <a class="button button--primary" href="agendamento.html" data-account-booking-continue>Escolher serviço e horário</a>
+            </section>
 
             <section class="account-summary-grid" aria-label="Resumo da conta">
                 <article class="account-summary-card"><span>Serviços concluídos</span><strong data-account-completed>—</strong></article>
@@ -105,18 +115,18 @@
 
     <nav class="mobile-dock" aria-label="Navegação rápida">
         <a href="../index.html" data-icon="home">Início</a>
-        <a href="agendamento.html" data-icon="calendar">Agendar</a>
+        <a href="minha-conta.html?acao=agendar" data-icon="calendar">Agendar</a>
         <a href="loja.html" data-icon="store">Loja</a>
         <a href="minha-conta.html" data-icon="user" aria-current="page">Conta</a>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js"></script>
-    <script src="../js/utils.js"></script>
-    <script src="../js/env.js"></script>
-    <script src="../js/supabase-client.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../js/customer-account.js"></script>
+    <script src="../js/config.js?v=11"></script>
+    <script src="../js/utils.js?v=11"></script>
+    <script src="../js/env.js?v=11"></script>
+    <script src="../js/supabase-client.js?v=11"></script>
+    <script src="../js/api.js?v=11"></script>
+    <script src="../js/main.js?v=11"></script>
+    <script src="../js/customer-account.js?v=11"></script>
 </body>
 </html>

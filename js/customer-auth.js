@@ -10,17 +10,21 @@
     const status = document.querySelector("[data-auth-status]");
     const params = new URLSearchParams(window.location.search);
 
+    const defaultRedirect = () => ["login", "register"].includes(page)
+        ? "minha-conta.html?acao=agendar"
+        : "minha-conta.html";
+
     const safeRedirect = () => {
         const requested = params.get("redirect");
-        if (!requested) return "minha-conta.html";
+        if (!requested) return defaultRedirect();
 
         try {
             const target = new URL(requested, window.location.href);
-            if (target.origin !== window.location.origin) return "minha-conta.html";
-            if (!target.pathname.includes("/pages/")) return "minha-conta.html";
+            if (target.origin !== window.location.origin) return defaultRedirect();
+            if (!target.pathname.includes("/pages/")) return defaultRedirect();
             return `${target.pathname.split("/").pop()}${target.search}${target.hash}`;
         } catch {
-            return "minha-conta.html";
+            return defaultRedirect();
         }
     };
 
@@ -64,9 +68,9 @@
     const friendlyError = (error) => {
         const message = String(error?.message || "");
         if (error?.name === "BackendNotConfiguredError") return window.DuAmigoConfig.backend.missingMessage;
-        if (/invalid login credentials/i.test(message)) return "E-mail ou senha incorretos.";
-        if (/email not confirmed/i.test(message)) return "Confirme seu e-mail antes de entrar.";
-        if (/user already registered/i.test(message)) return "Este e-mail já possui cadastro. Tente entrar.";
+        if (/invalid login credentials/i.test(message)) return "Não foi possível entrar com esses dados. Confira a senha ou crie sua conta.";
+        if (/email not confirmed/i.test(message)) return "Esta conta foi criada antes da confirmação de e-mail ser desativada. Exclua esse usuário de teste no Supabase e faça o cadastro novamente.";
+        if (/user already registered/i.test(message)) return "Este e-mail já possui cadastro. Use o botão Entrar.";
         if (/password should be at least/i.test(message)) return "A senha precisa ter pelo menos 6 caracteres.";
         if (/rate limit/i.test(message)) return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
         return message || "Não foi possível concluir agora. Tente novamente.";
@@ -85,13 +89,34 @@
         });
     };
 
+    const addRedirectToLink = (link, email = "") => {
+        if (!link) return;
+        const url = new URL(link.getAttribute("href"), window.location.href);
+        url.searchParams.set("redirect", safeRedirect());
+        if (email) url.searchParams.set("email", email);
+        link.setAttribute("href", `${url.pathname.split("/").pop()}${url.search}`);
+    };
+
     const keepRedirectInLinks = () => {
-        const redirect = safeRedirect();
+        const email = String(params.get("email") || "").trim();
         document.querySelectorAll("[data-register-link], [data-login-link]").forEach((link) => {
-            const url = new URL(link.getAttribute("href"), window.location.href);
-            url.searchParams.set("redirect", redirect);
-            link.setAttribute("href", `${url.pathname.split("/").pop()}${url.search}`);
+            addRedirectToLink(link, email);
         });
+    };
+
+    const prefillEmail = () => {
+        const email = String(params.get("email") || "").trim();
+        if (!email) return;
+        const input = document.querySelector('input[name="email"]');
+        if (input) input.value = email;
+    };
+
+    const showLoginHelp = (email) => {
+        const help = document.querySelector("[data-login-help]");
+        const register = document.querySelector("[data-login-help-register]");
+        if (!help) return;
+        help.hidden = false;
+        addRedirectToLink(register, email);
     };
 
     const handleLogin = () => {
@@ -103,18 +128,22 @@
             const email = form.elements.email.value.trim();
             const password = form.elements.password.value;
             const button = form.querySelector('button[type="submit"]');
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-            setError(form, "email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "" : "Informe um e-mail válido.");
+            setError(form, "email", emailValid ? "" : "Informe um e-mail válido.");
             setError(form, "password", password.length >= 6 ? "" : "Informe sua senha.");
-            if (!email || password.length < 6) return;
+            if (!emailValid || password.length < 6) return;
 
+            document.querySelector("[data-login-help]")?.setAttribute("hidden", "");
             setStatus("");
-            setLoading(button, true, "Entrando...");
+            setLoading(button, true, "Verificando conta...");
+
             try {
                 await api.auth.signIn(email, password);
                 window.location.replace(safeRedirect());
             } catch (error) {
                 setStatus(friendlyError(error), "error");
+                showLoginHelp(email);
             } finally {
                 setLoading(button, false);
             }
@@ -129,23 +158,23 @@
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const values = Object.fromEntries(new FormData(form));
+            const fullName = String(values.fullName || "").trim();
             const phone = String(values.phone || "").replace(/\D/g, "");
-            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(values.email || ""));
+            const email = String(values.email || "").trim();
+            const password = String(values.password || "");
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
             const valid = {
-                fullName: String(values.fullName || "").trim().length >= 3,
+                fullName: fullName.length >= 3,
                 phone: phone.length >= 10,
                 email: emailValid,
-                password: String(values.password || "").length >= 6,
-                passwordConfirm: values.password === values.passwordConfirm,
-                privacy: Boolean(values.privacy)
+                password: password.length >= 6
             };
 
-            setError(form, "fullName", valid.fullName ? "" : "Informe seu nome completo.");
+            setError(form, "fullName", valid.fullName ? "" : "Informe seu nome e sobrenome.");
             setError(form, "phone", valid.phone ? "" : "Informe um WhatsApp válido com DDD.");
             setError(form, "email", valid.email ? "" : "Informe um e-mail válido.");
             setError(form, "password", valid.password ? "" : "Use pelo menos 6 caracteres.");
-            setError(form, "passwordConfirm", valid.passwordConfirm ? "" : "As senhas não são iguais.");
-            setError(form, "privacy", valid.privacy ? "" : "Você precisa aceitar a Política de Privacidade.");
             if (!Object.values(valid).every(Boolean)) return;
 
             const button = form.querySelector('button[type="submit"]');
@@ -153,24 +182,26 @@
             setLoading(button, true, "Criando conta...");
 
             try {
-                const result = await api.auth.signUp({
-                    email: String(values.email).trim(),
-                    password: String(values.password),
-                    fullName: String(values.fullName).trim(),
+                let result = await api.auth.signUp({
+                    email,
+                    password,
+                    fullName,
                     phone
                 });
 
-                if (result.session) {
-                    await api.customer.syncProfile({
-                        fullName: String(values.fullName).trim(),
-                        phone
-                    });
-                    window.location.replace(safeRedirect());
-                    return;
+                // Com “Confirm email” desativado, o Supabase devolve uma sessão.
+                // A tentativa de login abaixo cobre atrasos de propagação da configuração.
+                if (!result?.session) {
+                    result = await api.auth.signIn(email, password);
                 }
 
-                form.reset();
-                setStatus("Cadastro criado. Confira seu e-mail para confirmar a conta antes de entrar.", "success");
+                if (!result?.session) {
+                    throw new Error("O login automático não foi liberado. Desative Confirm email no Supabase e tente novamente com um cadastro novo.");
+                }
+
+                await api.customer.syncProfile({ fullName, phone });
+                setStatus("Conta criada. Abrindo sua área...", "success");
+                window.setTimeout(() => window.location.replace(safeRedirect()), 350);
             } catch (error) {
                 setStatus(friendlyError(error), "error");
             } finally {
@@ -246,6 +277,7 @@
     const start = () => {
         configurePasswordToggles();
         keepRedirectInLinks();
+        prefillEmail();
         redirectExistingSession();
         handleLogin();
         handleRegister();

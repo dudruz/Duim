@@ -11,6 +11,12 @@
     const nextContainer = document.querySelector("[data-next-appointment]");
     const planContainer = document.querySelector("[data-customer-plan]");
     const form = document.querySelector("[data-profile-form]");
+    const params = new URLSearchParams(window.location.search);
+    const bookingRequested = params.get("acao") === "agendar";
+    const bookingGateway = document.querySelector("[data-account-booking-gateway]");
+    const bookingGatewayTitle = document.querySelector("[data-booking-gateway-title]");
+    const bookingGatewayText = document.querySelector("[data-booking-gateway-text]");
+    const bookingContinue = document.querySelector("[data-account-booking-continue]");
     let overview = null;
     let currentFilter = "all";
 
@@ -264,15 +270,47 @@
         renderPlan();
     };
 
+    const hasCompleteBookingProfile = () => {
+        const customer = overview?.customer || {};
+        const profile = overview?.profile || {};
+        const name = String(customer.name || profile.full_name || "").trim();
+        const phone = String(customer.phone || profile.phone || "").replace(/\D/g, "");
+        return Boolean(overview?.customer) && name.length >= 3 && phone.length >= 10;
+    };
+
+    const handleBookingRequest = () => {
+        if (!bookingRequested || !bookingGateway) return;
+        bookingGateway.hidden = false;
+
+        if (hasCompleteBookingProfile()) {
+            bookingGateway.dataset.state = "ready";
+            bookingGatewayTitle.textContent = "Conta verificada. Abrindo a agenda...";
+            bookingGatewayText.textContent = "Agora você poderá escolher o serviço, o dia e o horário disponível.";
+            bookingContinue.hidden = false;
+            window.setTimeout(() => window.location.replace("agendamento.html"), 650);
+            return;
+        }
+
+        bookingGateway.dataset.state = "profile";
+        bookingGatewayTitle.textContent = "Complete nome e WhatsApp antes de agendar.";
+        bookingGatewayText.textContent = "Esses dados identificam seu horário para o Duin. Depois de salvar, a agenda abre automaticamente.";
+        bookingContinue.hidden = true;
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.textContent = "Salvar e escolher horário";
+        window.setTimeout(() => document.getElementById("perfil")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250);
+    };
+
     const load = async () => {
         setStatus("Carregando sua conta...", "info");
         try {
             overview = await api.customer.getOverview();
             renderAll();
             setStatus("");
+            handleBookingRequest();
         } catch (error) {
-            if (/login|sessão/i.test(error?.message || "")) {
-                window.location.replace("login.html?redirect=minha-conta.html");
+            if (/login|sessão|session|auth/i.test(error?.message || "")) {
+                const redirect = bookingRequested ? "minha-conta.html?acao=agendar" : "minha-conta.html";
+                window.location.replace(`login.html?redirect=${encodeURIComponent(redirect)}`);
                 return;
             }
             setStatus(error?.name === "BackendNotConfiguredError"
@@ -348,6 +386,10 @@
                     birthDate: values.birthDate,
                     stylePreferences: values.stylePreferences
                 });
+                if (bookingRequested) {
+                    window.location.replace("agendamento.html");
+                    return;
+                }
                 await load();
                 setStatus("Perfil atualizado. Suas preferências já estão disponíveis para o Duin.", "success");
             } catch (error) {

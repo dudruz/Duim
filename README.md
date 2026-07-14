@@ -48,7 +48,7 @@ barbearia-du-amigo/
 
 ## Configuração rápida
 
-1. Execute os SQLs de `supabase/migrations/` na ordem, do `001` ao `006`.
+1. Execute os SQLs de `supabase/migrations/` na ordem, do `001` ao `007`.
 2. Crie o usuário administrador.
 3. Execute `supabase/bootstrap-admin.sql.example` com o UUID.
 4. Preencha `js/env.js`.
@@ -60,3 +60,10 @@ Veja `docs/INSTALACAO.md` para o passo a passo completo.
 ## Segurança
 
 O navegador usa somente a anon key. A service role não deve ser colocada no front. Clientes só conseguem ler os próprios dados por meio das políticas RLS e das funções autenticadas do banco.
+
+
+## Versão final — GitHub Pages + Supabase
+
+O cadastro não exige confirmação de e-mail. Todo botão **Agendar** passa pela **Minha conta**, verifica a sessão e o perfil e, quando necessário, mostra **Entrar** ou **Criar conta**. Após o cadastro, a sessão é iniciada automaticamente e o cliente segue para serviços, dias e horários.
+
+Antes de testar, desative **Confirm email** em **Supabase > Authentication > Providers > Email**. Veja `docs/INSTALACAO.md`.

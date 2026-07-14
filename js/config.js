@@ -16,6 +16,7 @@ window.DuAmigoConfig = Object.freeze({
     routes: Object.freeze({
         home: "index.html",
         booking: "pages/agendamento.html",
+        bookingEntry: "pages/minha-conta.html?acao=agendar",
         store: "pages/loja.html",
         privacy: "pages/privacidade.html",
         customerLogin: "pages/login.html",

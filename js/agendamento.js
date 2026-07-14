@@ -26,6 +26,9 @@
     const successPanel = document.querySelector("[data-booking-success]");
     const pageStatus = document.querySelector("[data-booking-page-status]");
     const customerStrip = document.querySelector("[data-booking-customer]");
+    const authGate = document.querySelector("[data-booking-auth-gate]");
+    const authenticatedArea = document.querySelector("[data-booking-authenticated]");
+    const gateMessage = document.querySelector("[data-booking-gate-message]");
 
     const setStatus = (message = "", type = "info") => {
         pageStatus.hidden = !message;
@@ -37,6 +40,21 @@
         document.querySelectorAll(selector).forEach((element) => {
             element.textContent = value;
         });
+    };
+
+    const showAuthGate = (message = "") => {
+        if (authGate) authGate.hidden = false;
+        if (authenticatedArea) authenticatedArea.hidden = true;
+        if (gateMessage) {
+            gateMessage.hidden = !message;
+            gateMessage.textContent = message;
+        }
+        setStatus("");
+    };
+
+    const showBooking = () => {
+        if (authGate) authGate.hidden = true;
+        if (authenticatedArea) authenticatedArea.hidden = false;
     };
 
     const formatPhone = (value = "") => {
@@ -314,7 +332,15 @@
             setText("[data-booking-protocol]", result?.appointment_id || "confirmado");
             successPanel.scrollIntoView({ behavior: "smooth", block: "center" });
         } catch (error) {
-            setStatus(error?.message || "Não foi possível concluir o agendamento. O horário pode ter acabado de ser ocupado.", "error");
+            const message = String(error?.message || "");
+            if (/create_public_appointment|permission denied for function/i.test(message)) {
+                setStatus("O banco ainda está com a função antiga de agendamento. Execute a migração 007 no Supabase e tente novamente.", "error");
+            } else if (/jwt|login|sessão|session|auth/i.test(message)) {
+                window.location.replace("minha-conta.html?acao=agendar");
+                return;
+            } else {
+                setStatus(message || "Não foi possível concluir o agendamento. O horário pode ter acabado de ser ocupado.", "error");
+            }
         } finally {
             button.disabled = false;
             button.textContent = original;
@@ -335,19 +361,31 @@
 
     const requireLogin = async () => {
         try {
-            state.account = await api.customer.getOverview();
-            if (!state.account.customer) {
-                window.location.replace("minha-conta.html#perfil");
+            const session = await api.auth.getSession();
+            if (!session) {
+                window.location.replace("minha-conta.html?acao=agendar");
                 return false;
             }
+
+            state.account = await api.customer.getOverview();
+            const customer = state.account.customer || {};
+            const profile = state.account.profile || {};
+            const hasName = Boolean(String(customer.name || profile.full_name || "").trim());
+            const hasPhone = String(customer.phone || profile.phone || "").replace(/\D/g, "").length >= 10;
+            if (!state.account.customer || !hasName || !hasPhone) {
+                window.location.replace("minha-conta.html?acao=agendar#perfil");
+                return false;
+            }
+
+            showBooking();
             showAccount();
             return true;
         } catch (error) {
             if (error?.name === "BackendNotConfiguredError") {
-                setStatus(config.backend.missingMessage, "error");
+                showAuthGate(config.backend.missingMessage);
                 return false;
             }
-            window.location.replace("login.html?redirect=agendamento.html");
+            window.location.replace("minha-conta.html?acao=agendar");
             return false;
         }
     };
