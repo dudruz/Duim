@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/mobile-v13.css">
 </head>
 <body data-admin-page="planos">
     <div class="admin-shell" data-admin-shell>
@@ -74,6 +75,18 @@
     </div>
 </section>
 
+<section class="finance-metric-grid" aria-label="Resumo de mensalidades" style="margin-bottom:1rem">
+    <article class="finance-metric-card is-highlight"><span>Receita mensal ativa</span><strong data-plan-recurring>—</strong></article>
+    <article class="finance-metric-card"><span>Mensalistas ativos</span><strong data-plan-active-count>—</strong></article>
+    <article class="finance-metric-card"><span>Aguardando aprovação</span><strong data-plan-pending-count>—</strong></article>
+    <article class="finance-metric-card"><span>Valor pendente</span><strong data-plan-pending-value>—</strong></article>
+</section>
+
+<section class="admin-panel" style="margin-bottom:1rem">
+    <div class="admin-panel__header"><div><h2>Solicitações de mensalidade</h2><p>Pagamentos em dinheiro precisam da sua aprovação. Pagamentos online são ativados pelo webhook.</p></div></div>
+    <div class="subscription-approval-list" data-subscription-requests></div>
+</section>
+
 <section class="admin-panel" style="margin-bottom:1rem">
     <div class="admin-panel__header"><h2>Planos</h2></div>
     <div class="management-grid" data-plans-grid></div>
@@ -127,12 +140,12 @@
     <div class="admin-toast" role="status" data-admin-toast hidden></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js?v=11"></script>
-    <script src="../js/utils.js?v=11"></script>
-    <script src="../js/env.js?v=11"></script>
-    <script src="../js/supabase-client.js?v=11"></script>
-    <script src="../js/api.js?v=11"></script>
-    <script src="../js/admin-core.js?v=11"></script>
-    <script src="../js/admin-planos.js?v=11"></script>
+    <script src="../js/config.js?v=13"></script>
+    <script src="../js/utils.js?v=13"></script>
+    <script src="../js/env.js?v=13"></script>
+    <script src="../js/supabase-client.js?v=13"></script>
+    <script src="../js/api.js?v=13"></script>
+    <script src="../js/admin-core.js?v=13"></script>
+    <script src="../js/admin-planos.js?v=13"></script>
 </body>
 </html>

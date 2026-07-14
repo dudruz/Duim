@@ -11,8 +11,9 @@ No **SQL Editor** do Supabase, execute os arquivos de `supabase/migrations/` nes
 5. `005_finance_automation.sql`
 6. `006_customer_portal.sql`
 7. `007_fix_booking_auth.sql`
+8. `008_normalize_brazil_phone.sql`
 
-A migração 007 libera a função autenticada usada pelo cliente e corrige o erro de permissão ao agendar.
+A migração 007 libera a função autenticada usada pelo cliente e corrige o erro de permissão ao agendar. A migração 008 padroniza telefones com ou sem `55` e corrige os links do WhatsApp.
 
 ## 2. Desativar a confirmação de e-mail
 
@@ -93,3 +94,9 @@ O arquivo `.nojekyll` já está incluído. Todos os caminhos do site são relati
 ## 8. Teste local
 
 Use Live Server no VS Code. Não abra os arquivos diretamente por `file://`.
+
+## Pagamentos e mensalistas (Etapa 13)
+
+Depois da configuração básica, execute `supabase/migrations/009_payments_subscriptions_mobile.sql`.
+
+Para ativar pré-pagamentos e mensalidades online, publique as três Edge Functions e configure `INFINITEPAY_HANDLE` e `PUBLIC_SITE_URL`. O passo a passo completo está em `docs/INFINITEPAY.md`.

@@ -21,3 +21,8 @@ Depois exclua cadastros de teste antigos e crie uma conta nova pelo site.
 ## Fluxo final
 
 `Agendar → Minha conta → Entrar ou criar conta → login automático → Minha conta → agenda`
+
+
+## Atualização v12
+
+Telefones brasileiros agora são aceitos com ou sem `+55`. O banco salva apenas DDD + número, a confirmação do agendamento exibe a máscara correta e os links do WhatsApp recebem exatamente um código do país.

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/mobile-v13.css">
 </head>
 <body data-admin-page="financeiro">
     <div class="admin-shell" data-admin-shell>
@@ -67,7 +68,7 @@
             <main class="admin-main">
 
 <section class="admin-page-heading">
-    <div><h2>Financeiro</h2><p>Entradas, saídas e saldo do período.</p></div>
+    <div><h2>Financeiro</h2><p>Recebimentos, valores a receber e projeção da agenda.</p></div>
     <button class="button button--primary" type="button" data-new-movement>Novo lançamento</button>
 </section>
 
@@ -76,18 +77,31 @@
     <label>Data final<input type="date" data-finance-end></label>
 </div>
 
-<section class="metric-grid">
-    <article class="metric-card"><span>Entradas</span><strong data-finance-income>—</strong></article>
-    <article class="metric-card"><span>Saídas</span><strong data-finance-expense>—</strong></article>
-    <article class="metric-card"><span>Saldo</span><strong data-finance-balance>—</strong></article>
+<section class="finance-metric-grid" aria-label="Resumo financeiro">
+    <article class="finance-metric-card is-highlight"><span>Total recebido</span><strong data-finance-received>—</strong><small>Entradas lançadas no caixa</small></article>
+    <article class="finance-metric-card"><span>A receber no salão</span><strong data-finance-salon-pending>—</strong><small>Horários confirmados ainda não pagos</small></article>
+    <article class="finance-metric-card"><span>Recebido no salão</span><strong data-finance-salon-received>—</strong><small>Atendimentos pagos presencialmente</small></article>
+    <article class="finance-metric-card"><span>Pré-pago online</span><strong data-finance-online-received>—</strong><small>Pagamentos confirmados pela InfinitePay</small></article>
+    <article class="finance-metric-card"><span>Mensalistas ativos</span><strong data-finance-monthly-active>—</strong><small data-finance-monthly-count>— clientes ativos</small></article>
+    <article class="finance-metric-card"><span>Projeção da agenda</span><strong data-finance-projection>—</strong><small>Agenda do período + mensalidades ativas</small></article>
 </section>
 
-<div class="admin-table-wrap">
-    <table class="admin-table finance-table">
-        <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Forma</th><th>Valor</th><th>Ação</th></tr></thead>
-        <tbody data-finance-body></tbody>
-    </table>
-</div>
+<section class="admin-panel" style="margin-bottom:1rem">
+    <div class="admin-panel__header">
+        <div><h2>Leitura do período</h2><p>Separação do que entrou, do que falta receber e das mensalidades aguardando ação.</p></div>
+    </div>
+    <div class="finance-breakdown" data-finance-breakdown></div>
+</section>
+
+<section class="admin-panel">
+    <div class="admin-panel__header"><div><h2>Movimentações</h2><p>Entradas automáticas e lançamentos manuais.</p></div></div>
+    <div class="admin-table-wrap">
+        <table class="admin-table finance-table">
+            <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Forma</th><th>Valor</th><th>Ação</th></tr></thead>
+            <tbody data-finance-body></tbody>
+        </table>
+    </div>
+</section>
 
 <dialog class="admin-modal" data-movement-modal>
     <div class="admin-modal__header"><h2>Novo lançamento</h2><button class="admin-modal__close" type="button" data-close-modal>×</button></div>
@@ -111,12 +125,12 @@
     <div class="admin-toast" role="status" data-admin-toast hidden></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js?v=11"></script>
-    <script src="../js/utils.js?v=11"></script>
-    <script src="../js/env.js?v=11"></script>
-    <script src="../js/supabase-client.js?v=11"></script>
-    <script src="../js/api.js?v=11"></script>
-    <script src="../js/admin-core.js?v=11"></script>
-    <script src="../js/admin-financeiro.js?v=11"></script>
+    <script src="../js/config.js?v=13"></script>
+    <script src="../js/utils.js?v=13"></script>
+    <script src="../js/env.js?v=13"></script>
+    <script src="../js/supabase-client.js?v=13"></script>
+    <script src="../js/api.js?v=13"></script>
+    <script src="../js/admin-core.js?v=13"></script>
+    <script src="../js/admin-financeiro.js?v=13"></script>
 </body>
 </html>

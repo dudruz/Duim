@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/mobile-v13.css">
 </head>
 <body data-admin-page="configuracoes">
     <div class="admin-shell" data-admin-shell>
@@ -93,12 +94,16 @@
                 <div class="form-field"><label>Intervalo da grade em minutos</label><input name="slot_interval_minutes" type="number" min="5" step="5"></div>
                 <div class="form-field"><label>Antecedência mínima em minutos</label><input name="booking_notice_minutes" type="number" min="0"></div>
                 <div class="form-field"><label>Prazo de cancelamento em horas</label><input name="cancellation_notice_hours" type="number" min="0"></div>
+                <div class="form-field"><label>Reserva do pré-pago em minutos</label><input name="online_payment_hold_minutes" type="number" min="5" max="60" step="5"></div>
                 <div class="form-field"><label>Fuso horário</label><input name="timezone" value="America/Sao_Paulo"></div>
             </div>
-            <div class="checkbox-row" style="margin-top:1rem">
+            <div class="checkbox-row settings-toggle-grid" style="margin-top:1rem">
                 <label class="checkbox-field"><input name="accepting_bookings" type="checkbox"> Aceitar agendamentos pelo site</label>
                 <label class="checkbox-field"><input name="store_enabled" type="checkbox"> Exibir catálogo de produtos</label>
+                <label class="checkbox-field"><input name="online_payments_enabled" type="checkbox"> Permitir pré-pagamento pela InfinitePay</label>
+                <label class="checkbox-field"><input name="subscription_sales_enabled" type="checkbox"> Permitir contratação de mensalidade</label>
             </div>
+            <p class="admin-muted" style="margin-top:.8rem">Ative a InfinitePay somente depois de publicar as Edge Functions e configurar sua InfiniteTag.</p>
         </section>
     </div>
     <div class="admin-form-actions"><button class="button button--primary" type="submit">Salvar configurações</button></div>
@@ -111,12 +116,12 @@
     <div class="admin-toast" role="status" data-admin-toast hidden></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js?v=11"></script>
-    <script src="../js/utils.js?v=11"></script>
-    <script src="../js/env.js?v=11"></script>
-    <script src="../js/supabase-client.js?v=11"></script>
-    <script src="../js/api.js?v=11"></script>
-    <script src="../js/admin-core.js?v=11"></script>
-    <script src="../js/admin-configuracoes.js?v=11"></script>
+    <script src="../js/config.js?v=13"></script>
+    <script src="../js/utils.js?v=13"></script>
+    <script src="../js/env.js?v=13"></script>
+    <script src="../js/supabase-client.js?v=13"></script>
+    <script src="../js/api.js?v=13"></script>
+    <script src="../js/admin-core.js?v=13"></script>
+    <script src="../js/admin-configuracoes.js?v=13"></script>
 </body>
 </html>
