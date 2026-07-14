@@ -25,7 +25,7 @@ alter table public.payments
     add column if not exists provider_transaction_nsu text,
     add column if not exists provider_slug text,
     add column if not exists receipt_url text,
-    add column if not exists capture_method text;
+    add column if not exists capture_method text;a
 
 create unique index if not exists payments_provider_order_nsu_unique
     on public.payments(provider_order_nsu)

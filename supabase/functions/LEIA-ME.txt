@@ -1,0 +1,25 @@
+EDGE FUNCTIONS PELO PAINEL WEB DO SUPABASE
+
+Projeto: zglooskfheyjlcbpgbwh
+
+1. Edge Functions > Secrets:
+   INFINITEPAY_HANDLE = sua InfiniteTag sem o símbolo $
+   PUBLIC_SITE_URL = https://dudruz.github.io
+   Se o site estiver em uma subpasta, use a URL completa da subpasta.
+
+2. Edge Functions > Deploy a new function > Via Editor.
+
+3. Crie exatamente estas funções:
+   - create-infinitepay-checkout
+   - verify-infinitepay-payment
+   - infinitepay-webhook
+
+4. Em cada função, apague o código de exemplo e cole o index.ts correspondente.
+
+5. Desative "Verify JWT" nas três funções.
+   As duas funções usadas pelo cliente validam a sessão dentro do próprio código.
+   O webhook precisa ser público para a InfinitePay conseguir chamá-lo.
+
+6. Clique em Deploy function.
+
+7. Teste pelo site logado e acompanhe Edge Functions > Logs.
